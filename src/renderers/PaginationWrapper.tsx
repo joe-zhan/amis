@@ -20,7 +20,7 @@ export interface PaginationWrapperSchema extends BaseSchema {
   /**
    * 最多显示多少个分页按钮。
    *
-   * @default 5
+   * @default 25
    */
   maxButtons?: number;
 
@@ -61,6 +61,7 @@ export interface PaginationWrapProps
   inputName: string;
   outputName: string;
   perPage: number;
+  maxButtons: number;
   store: IPaginationStore;
 }
 
@@ -69,6 +70,7 @@ export class PaginationWrapper extends React.Component<PaginationWrapProps> {
     inputName: 'items',
     outputName: 'items',
     perPage: 10,
+    maxButtons: 50,
     position: 'top'
   };
 
@@ -77,6 +79,7 @@ export class PaginationWrapper extends React.Component<PaginationWrapProps> {
     props.store.syncProps(props, undefined, [
       'perPage',
       'mode',
+      'maxButtons',
       'inputName',
       'outputName'
     ]);
@@ -87,6 +90,7 @@ export class PaginationWrapper extends React.Component<PaginationWrapProps> {
     store.syncProps(this.props, prevProps, [
       'perPage',
       'mode',
+      'maxButtons',
       'inputName',
       'outputName'
     ]);
@@ -113,6 +117,7 @@ export class PaginationWrapper extends React.Component<PaginationWrapProps> {
               activePage: store.page,
               lastPage: store.lastPage,
               mode: store.mode,
+              maxButton: store.maxButtons,
               onPageChange: store.switchTo,
               className: 'PaginationWrapper-pager'
             }

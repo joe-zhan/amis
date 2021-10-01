@@ -22,7 +22,7 @@ export interface PaginationSchema extends BaseSchema {
   /**
    * 最多显示多少个分页按钮。
    *
-   * @default 5
+   * @default 25
    */
   maxButtons?: number;
 }
@@ -48,7 +48,7 @@ export default class Pagination extends React.Component<
   static defaultProps = {
     activePage: 1,
     lastPage: 1,
-    maxButtons: 5,
+    maxButtons: 25,
     mode: 'normal',
     hasNext: false,
     showPageInput: false
@@ -133,27 +133,31 @@ export default class Pagination extends React.Component<
     let startPage: number;
     let endPage: number;
 
-    if (activePage < (maxButtons - 1) / 2 + 2) {
-      maxButtons = activePage + (maxButtons - 1) / 2;
-    }
+    // if (activePage < (maxButtons - 1) / 2 + 2) {
+    //   maxButtons = activePage + (maxButtons - 1) / 2;
+    // }
 
-    if (lastPage - activePage < (maxButtons - 1) / 2 + 2) {
-      maxButtons = lastPage - activePage + (maxButtons - 1) / 2 + 1;
-    }
+    // if (lastPage - activePage < (maxButtons - 1) / 2 + 2) {
+    //   maxButtons = lastPage - activePage + (maxButtons - 1) / 2 + 1;
+    // }
 
-    if (maxButtons && maxButtons < lastPage) {
-      startPage = Math.max(
-        Math.min(
-          activePage - Math.floor(maxButtons / 2),
-          lastPage - maxButtons + 1
-        ),
-        1
-      );
-      endPage = startPage + maxButtons - 1;
-    } else {
+    // if (maxButtons && maxButtons < lastPage) {
+    //   startPage = Math.max(
+    //     Math.min(
+    //       activePage - Math.floor(maxButtons / 2),
+    //       lastPage - maxButtons + 1
+    //     ),
+    //     1
+    //   );
+    //   endPage = startPage + maxButtons - 1;
+    // } else {
       startPage = 1;
       endPage = lastPage;
-    }
+    // }
+
+    // console.log(startPage)
+    // console.log(endPage)
+    // console.log(maxButtons)
 
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
@@ -259,7 +263,7 @@ export default class Pagination extends React.Component<
       <div className={cx('Pagination-wrap', className)}>
         <ul className={cx('Pagination', 'Pagination--sm')}>{pageButtons}</ul>
 
-        {showPageInput === true || lastPage > 9 ? (
+        {showPageInput === true ? (
           <div className={cx('Pagination-inputGroup')} key="toPage">
             {__('CRUD.paginationGoText')}
             <input

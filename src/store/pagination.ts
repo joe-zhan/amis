@@ -10,7 +10,8 @@ export const PaginationStore = iRendererStore
     perPage: 10,
     inputName: '',
     outputName: '',
-    mode: 'normal'
+    mode: 'normal',
+    maxButtons: 25
   })
   .views(self => ({
     get inputItems() {
