@@ -271,7 +271,7 @@ export interface FormSchema extends BaseSchema {
   /**
    * 页面离开提示，为了防止页面不小心跳转而导致表单没有保存。
    */
-  promptPageLeave?: boolean;
+  promptPageLeave?: SchemaExpression;
 
   /**
    * 具体的提示信息，选填。
@@ -595,7 +595,8 @@ export default class Form extends React.Component<FormProps, object> {
     const store = this.props.store;
     const {promptPageLeaveMessage, promptPageLeave} = this.props;
 
-    if (promptPageLeave && store.modified) {
+    const preventPageLeave = promptPageLeave ? promptPageLeave : "false";
+    if (evalExpression(preventPageLeave, this.props.data) && store.modified) {
       return promptPageLeaveMessage || '新的修改没有保存，确认要离开？';
     }
   }
