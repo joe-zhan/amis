@@ -148,6 +148,9 @@ export interface TableControlSchema
    * 最多同时显示多少个页面按钮
    */
   maxButtons?: number;
+
+  prevLabel?: string;
+  nextLabel?: string;
 }
 
 export interface TableProps
@@ -959,7 +962,9 @@ export default class FormTable extends React.Component<TableProps, TableState> {
       formInited,
       perPage,
       maxButtons,
-      classnames: cx
+      classnames: cx,
+      prevLabel,
+      nextLabel
     } = this.props;
 
     if (formInited === false) {
@@ -1035,7 +1040,9 @@ export default class FormTable extends React.Component<TableProps, TableState> {
                     lastPage: lastPage,
                     maxButtons: maxButtons,
                     onPageChange: this.handlePageChange,
-                    className: 'InputTable-pager'
+                    className: 'InputTable-pager',
+                    prevLabel: prevLabel,
+                    nextLabel: nextLabel
                   }
                 )
               : null}

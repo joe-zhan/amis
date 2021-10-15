@@ -3,6 +3,7 @@ import {Renderer, RendererProps} from '../factory';
 import {autobind} from '../utils/helper';
 import {Icon} from '../components/icons';
 import {BaseSchema, SchemaClassName} from '../Schema';
+import Button from '../components/Button';
 
 export interface PaginationSchema extends BaseSchema {
   type: 'pagination';
@@ -25,6 +26,16 @@ export interface PaginationSchema extends BaseSchema {
    * @default 25
    */
   maxButtons?: number;
+
+  /**
+   * 前一页button字样
+   */
+  prevLabel?: string;
+
+  /**
+   * 下一页button字样
+   */
+  nextLabel?: string;
 }
 
 export interface PaginationProps
@@ -34,6 +45,8 @@ export interface PaginationProps
   lastPage: number;
   hasNext: boolean;
   maxButtons: number;
+  prevLabel: string;
+  nextLabel: string;
   onPageChange: (page: number, perPage?: number) => void;
 }
 
@@ -68,7 +81,7 @@ export default class Pagination extends React.Component<
   }
 
   renderSimple() {
-    const {activePage, hasNext, onPageChange, classnames: cx} = this.props;
+    const {activePage, hasNext, onPageChange, classnames: cx, prevLabel, nextLabel} = this.props;
 
     return (
       <ul className={cx('Pagination', 'Pagination--sm')}>
@@ -82,8 +95,11 @@ export default class Pagination extends React.Component<
               : () => onPageChange(activePage - 1)
           }
         >
-          <a>
+          <a> {
+            prevLabel ?
+            <Button disabled={activePage === 1}> {prevLabel} </Button>  :
             <Icon icon="left-arrow" className="icon" />
+          }
           </a>
         </li>
         <li
@@ -96,8 +112,11 @@ export default class Pagination extends React.Component<
               : () => onPageChange(activePage + 1)
           }
         >
-          <a>
+          <a> {
+            nextLabel ?
+            <Button disabled={activePage === lastPage} > {nextLabel} </Button> :
             <Icon icon="right-arrow" className="icon" />
+          }
           </a>
         </li>
       </ul>
@@ -125,7 +144,9 @@ export default class Pagination extends React.Component<
       classnames: cx,
       showPageInput,
       className,
-      translate: __
+      translate: __,
+      prevLabel,
+      nextLabel
     } = this.props;
     const pageNum = this.state.pageNum;
 
@@ -154,10 +175,6 @@ export default class Pagination extends React.Component<
       startPage = 1;
       endPage = lastPage;
     // }
-
-    // console.log(startPage)
-    // console.log(endPage)
-    // console.log(maxButtons)
 
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
@@ -236,7 +253,11 @@ export default class Pagination extends React.Component<
         key="prev"
       >
         <span>
-          <Icon icon="left-arrow" className="icon" />
+        {
+            prevLabel ?
+            <Button disabled={activePage === 1}> {prevLabel} </Button>  :
+            <Icon icon="left-arrow" className="icon" />
+          }
         </span>
       </li>
     );
@@ -254,7 +275,11 @@ export default class Pagination extends React.Component<
         key="next"
       >
         <span>
-          <Icon icon="right-arrow" className="icon" />
+        {
+            nextLabel ?
+            <Button disabled={activePage === lastPage} > {nextLabel} </Button> :
+            <Icon icon="right-arrow" className="icon" />
+          }
         </span>
       </li>
     );
