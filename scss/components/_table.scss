@@ -873,7 +873,9 @@
 }
 
 .#{$ns}InputTable-pager {
-  margin-left: auto;
+  margin: 0 auto;
+  display: table;
+  position: relative;
 }
 
 .#{$ns}OperationField {
