@@ -81,7 +81,7 @@ export default class Pagination extends React.Component<
   }
 
   renderSimple() {
-    const {activePage, hasNext, onPageChange, classnames: cx, prevLabel, nextLabel} = this.props;
+    const {activePage, lastPage, hasNext, onPageChange, classnames: cx, prevLabel, nextLabel} = this.props;
 
     return (
       <ul className={cx('Pagination', 'Pagination--sm')}>
