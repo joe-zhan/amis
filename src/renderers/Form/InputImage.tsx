@@ -29,6 +29,8 @@ import {
   SchemaUrlPath
 } from '../../Schema';
 import {filter} from '../../utils/tpl';
+import isPlainObject from 'lodash/isPlainObject';
+import merge from 'lodash/merge';
 
 /**
  * Image 图片上传控件
@@ -109,6 +111,16 @@ export interface ImageControlSchema extends FormBaseControl {
         rotatable?: boolean;
         scalable?: boolean;
       };
+
+  /**
+   * 裁剪后的图片类型
+   */
+  cropFormat?: string;
+
+  /**
+   * 裁剪后的质量
+   */
+  cropQuality?: number;
 
   /**
    * 是否允许二次裁剪。
@@ -447,7 +459,7 @@ export default class ImageControl extends React.Component<
         files = (
           Array.isArray(value)
             ? value
-            : joinValues && typeof value === 'string'
+            : joinValues && typeof value === 'string' && multiple
             ? (value as string).split(delimiter)
             : [value]
         )
@@ -780,8 +792,8 @@ export default class ImageControl extends React.Component<
   }
 
   syncAutoFill() {
-    const {autoFill, multiple, onBulkChange} = this.props;
-    if (!isEmpty(autoFill)) {
+    const {autoFill, multiple, onBulkChange, data} = this.props;
+    if (!isEmpty(autoFill) && onBulkChange) {
       const files = this.state.files.filter(
         file => ~['uploaded', 'init', 'ready'].indexOf(file.state as string)
       );
@@ -793,7 +805,13 @@ export default class ImageControl extends React.Component<
             }
           : files[0]
       );
-      onBulkChange && onBulkChange(toSync);
+
+      Object.keys(toSync).forEach(key => {
+        if (isPlainObject(toSync[key]) && isPlainObject(data[key])) {
+          toSync[key] = merge({}, data[key], toSync[key]);
+        }
+      });
+      onBulkChange(toSync);
     }
   }
 
@@ -862,14 +880,19 @@ export default class ImageControl extends React.Component<
   }
 
   handleCrop() {
-    this.cropper.getCroppedCanvas().toBlob((file: File) => {
-      this.addFiles([file]);
-      this.setState({
-        cropFile: undefined,
-        locked: false,
-        lockedReason: ''
-      });
-    });
+    const {cropFormat, cropQuality} = this.props;
+    this.cropper.getCroppedCanvas().toBlob(
+      (file: File) => {
+        this.addFiles([file]);
+        this.setState({
+          cropFile: undefined,
+          locked: false,
+          lockedReason: ''
+        });
+      },
+      cropFormat || 'image/png',
+      cropQuality || 1
+    );
   }
 
   cancelCrop() {
@@ -1012,7 +1035,7 @@ export default class ImageControl extends React.Component<
     const __ = this.props.translate;
     this._send(file, this.props.receiver as string, {}, onProgress)
       .then((ret: Payload) => {
-        if (ret.status) {
+        if (ret.status && (ret as any).status !== '0') {
           throw new Error(ret.msg || __('File.errorRetry'));
         }
 
@@ -1362,7 +1385,6 @@ export default class ImageControl extends React.Component<
                                     fixedSize ? fixedSizeClassName : ''
                                   )}
                                 >
-                                  <p>{__('File.uploading')}</p>
                                   <div className={cx('ImageControl-progress')}>
                                     <span
                                       style={{
@@ -1375,6 +1397,7 @@ export default class ImageControl extends React.Component<
                                       )}
                                     />
                                   </div>
+                                  <p>{__('File.uploading')}</p>
                                 </div>
                               </>
                             ) : (
@@ -1509,7 +1532,10 @@ export default class ImageControl extends React.Component<
                             thumbRatio={thumbRatio}
                           />
                         ) : (
-                          <Icon icon="plus" className="icon" />
+                          <>
+                            <Icon icon="plus" className="icon" />
+                            <span>{__('File.upload')}</span>
+                          </>
                         )}
 
                         {isFocused ? (

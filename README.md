@@ -14,7 +14,8 @@
 <div align="center">
   QQ 群: 1147750223（已满） |
   QQ 群2: 651547026 |
-  如流群：3395342
+  如流群：3395342（已满）|
+  如流群2：5511067|
 </div>
 
 <div align="center">
@@ -79,6 +80,11 @@ npm run update-snapshot
 - [RickCole21](https://github.com/RickCole21)
 - [catchonme](https://github.com/catchonme)
 - [nwind](https://github.com/nwind)
+- [zhangtao07](https://github.com/zhangtao07)
+- [hsm-lv](https://github.com/hsm-lv)
+- [RUNZE LU](https://github.com/lurunze1226)
+- [ucasliyuan](https://github.com/ucasliyuan)
+- [yangwei9012](https://github.com/yangwei9012)
 
 ## 低代码平台
 

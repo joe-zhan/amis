@@ -16,6 +16,9 @@ const versionHash = fis.util.md5(package.version);
 Resource.extend({
   buildResourceMap: function () {
     const resourceMap = this.__super();
+    if (resourceMap === '') {
+      return '';
+    }
 
     const map = JSON.parse(resourceMap.substring(20, resourceMap.length - 2));
 
@@ -128,6 +131,7 @@ fis.match('monaco-editor/min/**.js', {
 
 fis.match('/docs/**.md', {
   rExt: 'js',
+  ignoreDependencies: true,
   parser: [
     parserMarkdown,
     function (contents, file) {
@@ -211,7 +215,7 @@ fis.match('*.html:jsx', {
 
 // 这些用了 esm
 fis.match(
-  '{echarts/extension/**.js,zrender/**.js,ansi-to-react/lib/index.js}',
+  '{echarts/extension/**.js,zrender/**.js,ansi-to-react/lib/index.js,markdown-it-html5-media/**.js}',
   {
     parser: fis.plugin('typescript', {
       sourceMap: false,
@@ -491,8 +495,8 @@ if (fis.project.currentMedia() === 'publish') {
         '!mpegts.js/**',
         '!hls.js/**',
         '!froala-editor/**',
+
         '!tinymce/**',
-        '!jquery/**',
         '!zrender/**',
         '!echarts/**',
         '!echarts-stat/**',
@@ -522,11 +526,7 @@ if (fis.project.currentMedia() === 'publish') {
         '!punycode/**'
       ],
 
-      'rich-text.js': [
-        'src/components/RichText.tsx',
-        'froala-editor/**',
-        'jquery/**'
-      ],
+      'rich-text.js': ['src/components/RichText.tsx', 'froala-editor/**'],
 
       'tinymce.js': ['src/components/Tinymce.tsx', 'tinymce/**'],
 
@@ -565,8 +565,8 @@ if (fis.project.currentMedia() === 'publish') {
         '!mpegts.js/**',
         '!hls.js/**',
         '!froala-editor/**',
+
         '!src/components/RichText.tsx',
-        '!jquery/**',
         '!zrender/**',
         '!echarts/**',
         '!papaparse/**',
@@ -751,19 +751,12 @@ if (fis.project.currentMedia() === 'publish') {
         return contents;
       }
 
-      return contents
-        .replace(
-          /(\\?(?:'|"))((?:get|post|delete|put)\:)?\/api\/mock2?/gi,
-          function (_, qutoa, method) {
-            return qutoa + (method || '') + `${cfcAddress}/mock2`;
-          }
-        )
-        .replace(
-          /(\\?(?:'|"))((?:get|post|delete|put)\:)?\/api\/sample/gi,
-          function (_, qutoa, method) {
-            return qutoa + (method || '') + `${cfcAddress}/sample`;
-          }
-        );
+      return contents.replace(
+        /(\\?(?:'|"))((?:get|post|delete|put)\:)?\/api\/(\w+)/gi,
+        function (_, qutoa, method, path) {
+          return qutoa + (method || '') + `${cfcAddress}/` + path;
+        }
+      );
     }
   });
 
@@ -780,8 +773,8 @@ if (fis.project.currentMedia() === 'publish') {
         '!mpegts.js/**',
         '!hls.js/**',
         '!froala-editor/**',
+
         '!tinymce/**',
-        '!jquery/**',
         '!zrender/**',
         '!echarts/**',
         '!echarts-stat/**',
@@ -811,11 +804,7 @@ if (fis.project.currentMedia() === 'publish') {
         '!punycode/**'
       ],
 
-      'pkg/rich-text.js': [
-        'src/components/RichText.js',
-        'froala-editor/**',
-        'jquery/**'
-      ],
+      'pkg/rich-text.js': ['src/components/RichText.js', 'froala-editor/**'],
 
       'pkg/tinymce.js': ['src/components/Tinymce.tsx', 'tinymce/**'],
 
@@ -867,8 +856,8 @@ if (fis.project.currentMedia() === 'publish') {
         '!mpegts.js/**',
         '!hls.js/**',
         '!froala-editor/**',
+
         '!src/components/RichText.tsx',
-        '!jquery/**',
         '!zrender/**',
         '!echarts/**',
         '!papaparse/**',

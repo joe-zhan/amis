@@ -54,6 +54,7 @@ import {
 import {ActionSchema} from '../Action';
 import {ButtonGroupControlSchema} from './ButtonGroupSelect';
 import {DialogSchemaBase} from '../Dialog';
+import Alert from '../../components/Alert2';
 
 export interface FormSchemaHorizontal {
   left?: number;
@@ -202,6 +203,11 @@ export interface FormSchema extends BaseSchema {
   mode?: 'normal' | 'inline' | 'horizontal';
 
   /**
+   * 表单项显示为几列
+   */
+  columnCount?: number;
+
+  /**
    * 如果是水平排版，这个属性可以细化水平排版的左右宽度占比。
    */
   horizontal?: FormSchemaHorizontal;
@@ -346,6 +352,7 @@ export default class Form extends React.Component<FormProps, object> {
       right: 10,
       offset: 2
     },
+    columnCount: 0,
     panelClassName: 'Panel--default',
     messages: {
       fetchFailed: 'fetchFailed',
@@ -366,6 +373,7 @@ export default class Form extends React.Component<FormProps, object> {
     'initFetch',
     'wrapWithPanel',
     'mode',
+    'columnCount',
     'collapsable',
     'horizontal',
     'panelClassName',
@@ -827,7 +835,7 @@ export default class Form extends React.Component<FormProps, object> {
       );
     }
 
-    if (store.persistData) {
+    if (store.persistData && store.inited) {
       store.setLocalPersistData();
     }
   }
@@ -858,6 +866,18 @@ export default class Form extends React.Component<FormProps, object> {
     const {onChange, store, formLazyChange} = this.props;
 
     store.updateData(values);
+
+    store.items.forEach(formItem => {
+      const updatedValue = getVariable(values, formItem.name, false);
+
+      if (updatedValue !== undefined) {
+        // 更新验证状态但保留错误信息
+        formItem.reset(true);
+        // 这里需要更新value，否则提交时不会使用新的字段值校验
+        formItem.changeTmpValue(updatedValue);
+        formItem.validateOnChange && formItem.validate(values);
+      }
+    });
 
     (formLazyChange === false ? this.emitChange : this.lazyEmitChange)(submit);
   }
@@ -1148,9 +1168,9 @@ export default class Form extends React.Component<FormProps, object> {
     store.closeDialog(true);
   }
 
-  handleDialogClose() {
+  handleDialogClose(confirmed = false) {
     const {store} = this.props;
-    store.closeDialog(false);
+    store.closeDialog(confirmed);
   }
 
   handleDrawerConfirm(
@@ -1418,6 +1438,7 @@ export default class Form extends React.Component<FormProps, object> {
       debug,
       $path,
       store,
+      columnCount,
       render
     } = this.props;
 
@@ -1429,7 +1450,12 @@ export default class Form extends React.Component<FormProps, object> {
 
     return (
       <WrapperComponent
-        className={cx(`Form`, `Form--${mode || 'normal'}`, className)}
+        className={cx(
+          `Form`,
+          `Form--${mode || 'normal'}`,
+          columnCount ? `Form--column Form--column-${columnCount}` : null,
+          className
+        )}
         onSubmit={this.handleFormSubmit}
         noValidate
       >
@@ -1494,6 +1520,8 @@ export default class Form extends React.Component<FormProps, object> {
 
   render() {
     const {
+      $path,
+      $schema,
       wrapWithPanel,
       render,
       title,
@@ -1508,11 +1536,9 @@ export default class Form extends React.Component<FormProps, object> {
       affixFooter,
       lazyLoad,
       translate: __,
-      footer
+      footer,
+      formStore
     } = this.props;
-
-    // trace(true);
-    // console.log('Form');
 
     let body: JSX.Element = this.renderBody();
 
@@ -1525,6 +1551,7 @@ export default class Form extends React.Component<FormProps, object> {
         },
         {
           className: cx(panelClassName, 'Panel--form'),
+          formStore: this.props.store,
           children: body,
           actions: this.buildActions(),
           onAction: this.handleAction,

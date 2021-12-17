@@ -14,6 +14,7 @@ import {str2rules, validate as doValidate} from '../utils/validations';
 import {Api, Payload, fetchOptions} from '../types';
 import {ComboStore, IComboStore, IUniqueGroup} from './combo';
 import {evalExpression} from '../utils/tpl';
+import {isEffectiveApi} from '../utils/api';
 import findIndex from 'lodash/findIndex';
 import {
   isArrayChildrenModified,
@@ -88,7 +89,8 @@ export const FormItemStore = StoreNode.named('FormItemStore')
     dialogSchema: types.frozen(),
     dialogOpen: false,
     dialogData: types.frozen(),
-    resetValue: types.optional(types.frozen(), '')
+    resetValue: types.optional(types.frozen(), ''),
+    validateOnChange: false
   })
   .views(self => {
     function getForm(): any {
@@ -233,7 +235,8 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       clearValueOnHidden,
       validateApi,
       maxLength,
-      minLength
+      minLength,
+      validateOnChange
     }: {
       required?: boolean;
       unique?: boolean;
@@ -254,6 +257,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       validateApi?: boolean;
       minLength?: number;
       maxLength?: number;
+      validateOnChange?: boolean;
     }) {
       if (typeof rules === 'string') {
         rules = str2rules(rules);
@@ -279,19 +283,25 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       typeof clearValueOnHidden !== 'undefined' &&
         (self.clearValueOnHidden = !!clearValueOnHidden);
       typeof validateApi !== 'undefined' && (self.validateApi = validateApi);
+      typeof validateOnChange !== 'undefined' &&
+        (self.validateOnChange = !!validateOnChange);
 
       rules = {
         ...rules,
         isRequired: self.required
       };
 
-      // if (typeof minLength === 'number') {
-      //   rules.minLength = minLength;
-      // }
+      // todo 这个弄个配置由渲染器自己来决定
+      // 暂时先这样
+      if (~['input-text', 'textarea'].indexOf(self.type)) {
+        if (typeof minLength === 'number') {
+          rules.minLength = minLength;
+        }
 
-      // if (typeof maxLength === 'number') {
-      //   rules.maxLength = maxLength;
-      // }
+        if (typeof maxLength === 'number') {
+          rules.maxLength = maxLength;
+        }
+      }
 
       if (isObjectShallowModified(rules, self.rules)) {
         self.rules = rules;
@@ -311,7 +321,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
     let validateCancel: Function | null = null;
     const validate: (data: Object, hook?: any) => Promise<boolean> = flow(
       function* validate(data: Object, hook?: any) {
-        if (self.validating && !self.validateApi) {
+        if (self.validating && !isEffectiveApi(self.validateApi, data)) {
           return self.valid;
         }
 
@@ -325,7 +335,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
           doValidate(self.tmpValue, data, self.rules, self.messages, self.__)
         );
 
-        if (!self.errors.length && self.validateApi) {
+        if (!self.errors.length && isEffectiveApi(self.validateApi, data)) {
           if (validateCancel) {
             validateCancel();
             validateCancel = null;
@@ -352,11 +362,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
 
         self.validated = true;
 
-        if (
-          self.unique &&
-          self.form.parentStore &&
-          self.form.parentStore.storeType === 'ComboStore'
-        ) {
+        if (self.unique && self.form?.parentStore?.storeType === 'ComboStore') {
           const combo = self.form.parentStore as IComboStore;
           const group = combo.uniques.get(self.name) as IUniqueGroup;
 
@@ -368,7 +374,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
                 item.value === self.tmpValue
             )
           ) {
-            addError(self.__('`当前值不唯一`'));
+            addError(self.__('Form.unique'));
           }
         }
 
@@ -617,12 +623,104 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       return json;
     });
 
+    const tryDeferLoadLeftOptions: (
+      option: any,
+      api: Api,
+      data?: object,
+      config?: fetchOptions
+    ) => Promise<Payload | null> = flow(function* (
+      option: any,
+      api: string,
+      data: object,
+      config?: fetchOptions
+    ) {
+      if (
+        self.options.length != 1 ||
+        !Array.isArray(self.options[0].leftOptions)
+      ) {
+        return;
+      }
+
+      let leftOptions = self.options[0].leftOptions as any;
+
+      const indexes = findTreeIndex(leftOptions, item => item === option);
+      if (!indexes) {
+        return;
+      }
+
+      setOptions(
+        [
+          {
+            ...self.options[0],
+            leftOptions: spliceTree(leftOptions, indexes, 1, {
+              ...option,
+              loading: true
+            })
+          }
+        ],
+        undefined,
+        data
+      );
+
+      let json = yield fetchOptions(
+        api,
+        data,
+        {
+          ...config,
+          silent: true
+        },
+        false
+      );
+      if (!json) {
+        setOptions(
+          [
+            {
+              ...self.options[0],
+              leftOptions: spliceTree(leftOptions, indexes, 1, {
+                ...option,
+                loading: false,
+                error: true
+              })
+            }
+          ],
+          undefined,
+          data
+        );
+        return;
+      }
+
+      let options: Array<IOption> =
+        json.data?.options ||
+        json.data.items ||
+        json.data.rows ||
+        json.data ||
+        [];
+
+      setOptions(
+        [
+          {
+            ...self.options[0],
+            leftOptions: spliceTree(leftOptions, indexes, 1, {
+              ...option,
+              loading: false,
+              loaded: true,
+              children: options
+            })
+          }
+        ],
+        undefined,
+        data
+      );
+
+      return json;
+    });
+
     const deferLoadOptions: (
       option: any,
       api: Api,
       data?: object,
       config?: fetchOptions
-    ) => Promise<Payload | null> = flow(function* getInitData(
+    ) => Promise<Payload | null> = flow(function* (
       option: any,
       api: string,
       data: object,
@@ -630,7 +728,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
     ) {
       const indexes = findTreeIndex(self.options, item => item === option);
       if (!indexes) {
-        return;
+        return yield tryDeferLoadLeftOptions(option, api, data, config);
       }
 
       setOptions(
@@ -937,7 +1035,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       subStore = store;
     }
 
-    function reset() {
+    function reset(keepErrors: boolean = false) {
       self.validated = false;
 
       if (subStore && subStore.storeType === 'ComboStore') {
@@ -945,7 +1043,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
         combo.forms.forEach(form => form.reset());
       }
 
-      clearError();
+      !keepErrors && clearError();
     }
 
     function openDialog(

@@ -1,9 +1,12 @@
 import React from 'react';
 import {ClassNamesFn} from '../../theme';
-import {IColumn, IRow} from '../../store/table';
+import {IColumn, IRow, ITableStore} from '../../store/table';
 import {SchemaNode, Action} from '../../types';
 import {TableBody} from './TableBody';
 import {LocaleProps} from '../../locale';
+import {observer} from 'mobx-react';
+import {ActionSchema} from '../Action';
+import ItemActionsWrapper from './ItemActionsWrapper';
 
 export interface TableContentProps extends LocaleProps {
   className?: string;
@@ -30,7 +33,7 @@ export interface TableContentProps extends LocaleProps {
     item: IRow,
     props: any
   ) => React.ReactNode;
-  onCheck: (item: IRow) => void;
+  onCheck: (item: IRow, value: boolean, shift?: boolean) => void;
   onQuickChange?: (
     item: IRow,
     values: object,
@@ -47,9 +50,46 @@ export interface TableContentProps extends LocaleProps {
   data?: any;
   prefixRow?: Array<any>;
   affixRow?: Array<any>;
+  itemAction?: ActionSchema;
+  itemActions?: Array<Action>;
+  store: ITableStore;
 }
 
+@observer
 export class TableContent extends React.Component<TableContentProps> {
+  renderItemActions() {
+    const {itemActions, render, store, classnames: cx} = this.props;
+    const finalActions = Array.isArray(itemActions)
+      ? itemActions.filter(action => !action.hiddenOnHover)
+      : [];
+
+    if (!finalActions.length) {
+      return null;
+    }
+
+    return (
+      <ItemActionsWrapper store={store} classnames={cx}>
+        <div className={cx('Table-itemActions')}>
+          {finalActions.map((action, index) =>
+            render(
+              `itemAction/${index}`,
+              {
+                ...(action as any),
+                isMenuItem: true
+              },
+              {
+                key: index,
+                item: store.hoverRow,
+                data: store.hoverRow!.locals,
+                rowIndex: store.hoverRow!.index
+              }
+            )
+          )}
+        </div>
+      </ItemActionsWrapper>
+    );
+  }
+
   render() {
     const {
       placeholder,
@@ -77,7 +117,9 @@ export class TableContent extends React.Component<TableContentProps> {
       prefixRow,
       locale,
       translate,
-      affixRow
+      itemAction,
+      affixRow,
+      store
     } = this.props;
 
     const tableClassName = cx('Table-table', this.props.tableClassName);
@@ -89,6 +131,7 @@ export class TableContent extends React.Component<TableContentProps> {
         className={cx('Table-content', className)}
         onScroll={onScroll}
       >
+        {store.hoverRow ? this.renderItemActions() : null}
         <table ref={tableRef} className={tableClassName}>
           <thead>
             {columnsGroup.length ? (
@@ -130,6 +173,7 @@ export class TableContent extends React.Component<TableContentProps> {
             </tbody>
           ) : (
             <TableBody
+              itemAction={itemAction}
               classnames={cx}
               render={render}
               renderCell={renderCell}

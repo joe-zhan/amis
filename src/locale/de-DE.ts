@@ -102,6 +102,7 @@ register('de-DE', {
   'Form.title': 'Formular',
   'Form.unique': 'Aktueller Wert ist nicht eindeutig',
   'Form.validateFailed': 'Fehler bei der Überprüfung der Formulareingabe',
+  'Form.nestedError': 'Form kann nicht als Nachkomme von Form erscheinen',
   'Image.configError': 'Es können nur eine Beschneidung oder mehrere festgelegt werden',
   'Image.crop': 'Bild beschneiden',
   'Image.dragDrop': 'Bilder per Drag & Drop hier ablegen',
@@ -157,6 +158,7 @@ register('de-DE', {
   'System.requestError': 'Anfragefehler: ',
   'System.requestErrorStatus': 'Anfragefehler, Statuscode:',
   'Table.addRow': 'Zeile hinzufügen',
+  'Table.copyRow': 'Zeile kopieren',
   'Table.columnsVisibility': 'Klicken, um die Sichtbarkeit der Spalten zu steuern',
   'Table.deleteRow': 'Aktuele Zeile löschen',
   'Table.discard': 'Verwerfen',
@@ -170,6 +172,8 @@ register('de-DE', {
   'Table.startSort': 'Klicken, um Sortierung zu starten',
   'Table.valueField': 'valueField muss vorhanden sein',
   'Table.index': 'Index',
+  'Table.toggleColumn': 'Spalten anzeigen',
+  'Table.searchFields': 'Abfragefelder setzen',
   'Tag.placeholder': 'Noch kein Tag',
   'Tag.tip': 'Kürzlich verwendetes Tag',
   'Text.add': 'Neu {{label}}',
@@ -177,6 +181,7 @@ register('de-DE', {
   'Transfer.configError': 'Konfigurationsfehler',
   'Transfer.refreshIcon': 'Zum Aktualisieren klicken',
   'Transfer.searchKeyword': 'Stichwörter eingeben',
+  'Transfer.available': 'Verfügbar',
   'Transfer.selectd': 'Ausgewählt',
   'Transfer.selectFromLeft': 'Von links auswählen',
   'Tree.addChild': 'Untergeordnetes Element hinzufügen',
@@ -218,6 +223,7 @@ register('de-DE', {
   'Wizard.saveAndNext': 'Speichern & Weiter',
   'year-to-year': '{{from}} - {{to}}',
   'Year.placeholder': 'Wählen Sie ein Jahr',
+  'reload': 'Neu laden',
   'rotate': 'Drehen',
   'Editor.fullscreen': 'Schirmfüllend Modus',
   'Editor.exitFullscreen': 'Zurücktreten Schirmfüllend Modus',
@@ -247,5 +253,6 @@ register('de-DE', {
   'Condition.placeholder': 'Text einfügen',
   'Condition.cond_placeholder': 'Bedingung auswählen',
   'Condition.field_placeholder': 'Feld auswählen',
-  'Condition.blank': 'leer'
+  'Condition.blank': 'leer',
+  'InputTable.uniqueError': 'Column `{{label}}` unique validate failed'
 });
