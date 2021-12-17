@@ -1,7 +1,6 @@
-import omit from 'lodash/omit';
-import {Api, ApiObject, EventTrack, fetcherResult, Payload} from '../types';
+import {Api, ApiObject, fetcherResult, Payload} from '../types';
 import {fetcherConfig} from '../factory';
-import {tokenize, dataMapping, escapeHtml} from './tpl-builtin';
+import {tokenize, dataMapping} from './tpl-builtin';
 import {evalExpression} from './tpl';
 import {
   isObject,
@@ -11,12 +10,10 @@ import {
   qsstringify,
   cloneObject,
   createObject,
-  qsparse,
-  uuid
+  qsparse
 } from './helper';
-import isPlainObject from 'lodash/isPlainObject';
 
-const rSchema = /(?:^|raw\:)(get|post|put|delete|patch|options|head|jsonp):/i;
+const rSchema = /(?:^|raw\:)(get|post|put|delete|patch|options|head):/i;
 
 interface ApiCacheConfig extends ApiObject {
   cachedPromise: Promise<any>;
@@ -24,8 +21,6 @@ interface ApiCacheConfig extends ApiObject {
 }
 
 const apiCaches: Array<ApiCacheConfig> = [];
-
-const isIE = !!(document as any).documentMode;
 
 export function normalizeApi(
   api: Api,
@@ -64,23 +59,6 @@ export function buildApi(
   };
   api.method = (api.method || (options as any).method || 'get').toLowerCase();
 
-  if (api.headers) {
-    api.headers = dataMapping(api.headers, data, undefined, false);
-  }
-
-  if (api.requestAdaptor && typeof api.requestAdaptor === 'string') {
-    api.requestAdaptor = str2function(api.requestAdaptor, 'api') as any;
-  }
-
-  if (api.adaptor && typeof api.adaptor === 'string') {
-    api.adaptor = str2function(
-      api.adaptor,
-      'payload',
-      'response',
-      'api'
-    ) as any;
-  }
-
   if (!data) {
     return api;
   } else if (
@@ -102,9 +80,7 @@ export function buildApi(
     );
     api.url =
       tokenize(api.url.substring(0, idx + 1), data, '| url_encode') +
-      qsstringify(
-        (api.query = dataMapping(params, data, undefined, api.convertKeyToPath))
-      ) +
+      qsstringify((api.query = dataMapping(params, data))) +
       (~hashIdx ? api.url.substring(hashIdx) : '');
   } else {
     api.url = tokenize(api.url, data, '| url_encode');
@@ -115,18 +91,13 @@ export function buildApi(
   }
 
   if (api.data) {
-    api.body = api.data = dataMapping(
-      api.data,
-      data,
-      undefined,
-      api.convertKeyToPath
-    );
+    api.body = api.data = dataMapping(api.data, data);
   } else if (api.method === 'post' || api.method === 'put') {
     api.body = api.data = cloneObject(data);
   }
 
   // get 类请求，把 data 附带到 url 上。
-  if (api.method === 'get' || api.method === 'jsonp') {
+  if (api.method === 'get') {
     if (!~raw.indexOf('$') && !api.data && autoAppend) {
       api.query = api.data = data;
     } else if (
@@ -164,6 +135,23 @@ export function buildApi(
     }
   }
 
+  if (api.headers) {
+    api.headers = dataMapping(api.headers, data);
+  }
+
+  if (api.requestAdaptor && typeof api.requestAdaptor === 'string') {
+    api.requestAdaptor = str2function(api.requestAdaptor, 'api') as any;
+  }
+
+  if (api.adaptor && typeof api.adaptor === 'string') {
+    api.adaptor = str2function(
+      api.adaptor,
+      'payload',
+      'response',
+      'api'
+    ) as any;
+  }
+
   return api;
 }
 
@@ -196,26 +184,11 @@ export function str2AsyncFunction(
 }
 
 export function responseAdaptor(ret: fetcherResult, api: ApiObject) {
-  let data = ret.data;
+  const data = ret.data;
   let hasStatusField = true;
 
   if (!data) {
-    throw new Error('Response is empty');
-  }
-
-  if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data);
-      if (typeof data === 'undefined') {
-        throw new Error('Response should be JSON');
-      }
-    } catch (e) {
-      const responseBrief =
-        typeof data === 'string'
-          ? escapeHtml((data as string).substring(0, 100))
-          : '';
-      throw new Error(`Response should be JSON\n ${responseBrief}`);
-    }
+    throw new Error('Response is empty!');
   }
 
   // 兼容几种常见写法
@@ -263,7 +236,7 @@ export function responseAdaptor(ret: fetcherResult, api: ApiObject) {
   }
 
   if (payload.ok && api.responseData) {
-    const responseData = dataMapping(
+    payload.data = dataMapping(
       api.responseData,
 
       createObject(
@@ -273,20 +246,15 @@ export function responseAdaptor(ret: fetcherResult, api: ApiObject) {
               items: payload.data
             }
           : payload.data) || {}
-      ),
-      undefined,
-      api.convertKeyToPath
+      )
     );
-    console.debug('responseData', responseData);
-    payload.data = responseData;
   }
 
   return payload;
 }
 
 export function wrapFetcher(
-  fn: (config: fetcherConfig) => Promise<fetcherResult>,
-  tracker?: (eventTrack: EventTrack, data: any) => void
+  fn: (config: fetcherConfig) => Promise<fetcherResult>
 ): (api: Api, data: object, options?: object) => Promise<Payload | void> {
   return function (api, data, options) {
     api = buildApi(api, data, options) as ApiObject;
@@ -316,15 +284,6 @@ export function wrapFetcher(
       api.headers['Content-Type'] = 'application/json';
     }
 
-    tracker?.(
-      {eventType: 'api', eventData: omit(api, ['config', 'data', 'body'])},
-      api.data
-    );
-
-    if (api.method?.toLocaleLowerCase() === 'jsonp') {
-      return wrapAdaptor(jsonpFetcher(api), api);
-    }
-
     if (typeof api.cache === 'number' && api.cache > 0) {
       const apiCache = getApiCache(api);
       return wrapAdaptor(
@@ -333,15 +292,6 @@ export function wrapFetcher(
           : setApiCache(api, fn(api)),
         api
       );
-    }
-    // IE 下 get 请求会被缓存，所以自动加个时间戳
-    if (isIE && api && api.method?.toLocaleLowerCase() === 'get') {
-      const timeStamp = `_t=${Date.now()}`;
-      if (api.url.indexOf('?') === -1) {
-        api.url = api.url + `?${timeStamp}`;
-      } else {
-        api.url = api.url + `&${timeStamp}`;
-      }
     }
     return wrapAdaptor(fn(api), api);
   };
@@ -365,71 +315,6 @@ export function wrapAdaptor(promise: Promise<fetcherResult>, api: ApiObject) {
         })
         .then(ret => responseAdaptor(ret, api))
     : promise.then(ret => responseAdaptor(ret, api));
-}
-
-export function jsonpFetcher(api: ApiObject): Promise<fetcherResult> {
-  return new Promise((resolve, reject) => {
-    let script: HTMLScriptElement | null = document.createElement('script');
-    let src = api.url;
-
-    script.async = true;
-
-    function remove() {
-      if (script) {
-        // @ts-ignore
-        script.onload = script.onreadystatechange = script.onerror = null;
-
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-
-        script = null;
-      }
-    }
-
-    const jsonp = api.query?.callback || 'axiosJsonpCallback' + uuid();
-    const old = (window as any)[jsonp];
-
-    (window as any)[jsonp] = function (responseData: any) {
-      (window as any)[jsonp] = old;
-
-      const response = {
-        data: responseData,
-        status: 200,
-        headers: {}
-      };
-
-      resolve(response);
-    };
-
-    const additionalParams: any = {
-      _: new Date().getTime(),
-      _callback: jsonp
-    };
-
-    src += (src.indexOf('?') >= 0 ? '&' : '?') + qsstringify(additionalParams);
-
-    // @ts-ignore IE 为script.onreadystatechange
-    script.onload = script.onreadystatechange = function () {
-      // @ts-ignore
-      if (!script.readyState || /loaded|complete/.test(script.readyState)) {
-        remove();
-      }
-    };
-
-    script.onerror = function () {
-      remove();
-      const errResponse = {
-        status: 0,
-        headers: {}
-      };
-
-      reject(errResponse);
-    };
-
-    script.src = src;
-    document.head.appendChild(script);
-  });
 }
 
 export function isApiOutdated(
@@ -562,18 +447,6 @@ export function setApiCache(
 
 export function clearApiCache() {
   apiCaches.splice(0, apiCaches.length);
-}
-
-export function normalizeApiResponseData(data: any) {
-  if (typeof data === 'undefined') {
-    data = {};
-  } else if (!isPlainObject(data)) {
-    data = {
-      [Array.isArray(data) ? 'items' : 'result']: data
-    };
-  }
-
-  return data;
 }
 
 // window.apiCaches = apiCaches;

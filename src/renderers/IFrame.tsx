@@ -6,7 +6,7 @@ import {ScopedContext, IScopedContext} from '../Scoped';
 import {buildApi, isApiOutdated} from '../utils/api';
 import {BaseSchema, SchemaUrlPath} from '../Schema';
 import {ActionSchema} from './Action';
-import {dataMapping} from '../utils/tpl-builtin';
+import {isPureVariable, resolveVariableAndFilter} from '../utils/tpl-builtin';
 
 /**
  * IFrame 渲染器
@@ -149,7 +149,7 @@ export default class IFrame extends React.Component<IFrameProps, object> {
 
   render() {
     const {width, height} = this.state;
-    let {className, src, name, frameBorder, data, style} = this.props;
+    let {className, src, frameBorder, data, style} = this.props;
 
     let tempStyle: any = {};
 
@@ -161,7 +161,9 @@ export default class IFrame extends React.Component<IFrameProps, object> {
       ...style
     };
 
-    src = dataMapping(src, data);
+    if (isPureVariable(src)) {
+      src = resolveVariableAndFilter(src, data, '| raw');
+    }
 
     const finalSrc = src ? buildApi(src, data).url : undefined;
 
@@ -175,7 +177,6 @@ export default class IFrame extends React.Component<IFrameProps, object> {
 
     return (
       <iframe
-        name={name}
         className={className}
         frameBorder={frameBorder}
         style={style}

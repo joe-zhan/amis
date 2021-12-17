@@ -1,8 +1,7 @@
 import React from 'react';
 import {FormItem, FormControlProps, FormBaseControl} from './Item';
 import {ClassNamesFn, themeable, ThemeProps} from '../../theme';
-import Spinner from '../../components/Spinner';
-import Select from '../../components/Select';
+import {Select, Spinner} from '../../components';
 import {autobind} from '../../utils/helper';
 import {Option} from './Options';
 import {localeable, LocaleProps} from '../../locale';
@@ -294,8 +293,13 @@ export class CityPicker extends React.Component<
 
   @autobind
   syncOut() {
-    const {onChange, allowStreet, joinValues, extractValue, delimiter} =
-      this.props;
+    const {
+      onChange,
+      allowStreet,
+      joinValues,
+      extractValue,
+      delimiter
+    } = this.props;
 
     const {code, province, city, district, street} = this.state;
 

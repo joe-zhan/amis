@@ -2,14 +2,14 @@ import React from 'react';
 import {autobind} from '../utils/helper';
 import Tabs, {Tab} from './Tabs';
 import SearchBox from './SearchBox';
-import TableCheckboxes from './TableSelection';
-import TreeCheckboxes from './TreeSelection';
-import ChainedCheckboxes from './ChainedSelection';
-import ListCheckboxes from './GroupedSelection';
+import TableCheckboxes from './TableCheckboxes';
+import TreeCheckboxes from './TreeCheckboxes';
+import ChainedCheckboxes from './ChainedCheckboxes';
+import ListCheckboxes from './ListCheckboxes';
 import {Options, Option} from './Select';
 import Transfer, {TransferProps} from './Transfer';
 import {themeable} from '../theme';
-import AssociatedCheckboxes from './AssociatedSelection';
+import AssociatedCheckboxes from './AssociatedCheckboxes';
 import {localeable} from '../locale';
 
 export interface TabsTransferProps
@@ -121,7 +121,7 @@ export class TabsTransfer extends React.Component<TabsTransferProps> {
     return (
       <Tabs
         mode="card"
-        className={cx('TabsTransfer-tabs')}
+        className={cx('Transfer-tabs')}
         activeKey={searchResult !== null ? 0 : undefined}
         toolbar={
           searchable ? (
@@ -134,12 +134,7 @@ export class TabsTransfer extends React.Component<TabsTransferProps> {
       >
         {searchResult !== null
           ? [
-              <Tab
-                className="TabsTransfer-tab"
-                title={__('searchResult')}
-                key={0}
-                eventKey={0}
-              >
+              <Tab title={__('searchResult')} key={0} eventKey={0}>
                 {this.renderSearchResult(searchResult)}
               </Tab>
             ]
@@ -148,7 +143,6 @@ export class TabsTransfer extends React.Component<TabsTransferProps> {
                 eventKey={index}
                 key={index}
                 title={option.label || option.title}
-                className="TabsTransfer-tab"
               >
                 {option.selectMode === 'table' ? (
                   <TableCheckboxes

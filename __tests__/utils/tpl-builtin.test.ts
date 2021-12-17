@@ -68,7 +68,7 @@ const filters = [
     },
     path: '$$',
     filter: '| raw',
-    expectValue: {a: 1}
+    expectValue: undefined
   },
   {
     type: 'raw7',
@@ -87,8 +87,8 @@ const filters = [
         b: 'b'
       }
     },
-    path: '${value| json:0}',
-    filter: '',
+    path: '${value}',
+    filter: '| json:0',
     expectValue: '{"a":"a","b":"b"}'
   },
   {
@@ -96,8 +96,8 @@ const filters = [
     data: {
       value: '{"a":"a","b":"b"}'
     },
-    path: '${value| toJson}',
-    filter: '',
+    path: '${value}',
+    filter: '| toJson',
     expectValue: {
       a: 'a',
       b: 'b'
@@ -108,8 +108,8 @@ const filters = [
     data: {
       value: 1559649981
     },
-    path: '${value| date}',
-    filter: '',
+    path: '${value}',
+    filter: '| date',
     expectValue: moment(1559649981, 'X').format('LLL')
   },
   {
@@ -117,8 +117,8 @@ const filters = [
     data: {
       value: 9999
     },
-    path: '${value| number}',
-    filter: '',
+    path: '${value}',
+    filter: '| number',
     expectValue: '9,999'
   },
   {
@@ -126,8 +126,8 @@ const filters = [
     data: {
       value: '  abc '
     },
-    path: '${value| trim}',
-    filter: '',
+    path: '${value}',
+    filter: '| trim',
     expectValue: 'abc'
   },
   {
@@ -135,8 +135,8 @@ const filters = [
     data: {
       value: 0.8232343
     },
-    path: '${value| percent}',
-    filter: '',
+    path: '${value}',
+    filter: '| percent',
     expectValue: '82%'
   },
   // duration
@@ -145,8 +145,8 @@ const filters = [
     data: {
       value: 1
     },
-    path: '${value| duration}',
-    filter: '',
+    path: '${value}',
+    filter: '| duration',
     expectValue: '1秒'
   },
   {
@@ -154,8 +154,8 @@ const filters = [
     data: {
       value: 61
     },
-    path: '${value| duration}',
-    filter: '',
+    path: '${value}',
+    filter: '| duration',
     expectValue: '1分1秒'
   },
   {
@@ -163,8 +163,8 @@ const filters = [
     data: {
       value: 233233
     },
-    path: '${value| duration}',
-    filter: '',
+    path: '${value}',
+    filter: '| duration',
     expectValue: '2天16时47分13秒'
   },
   // bytes
@@ -173,8 +173,8 @@ const filters = [
     data: {
       value: 1024
     },
-    path: '${value| bytes}',
-    filter: '',
+    path: '${value}',
+    filter: '| bytes',
     expectValue: '1.02 KB'
   },
   {
@@ -182,8 +182,8 @@ const filters = [
     data: {
       value: 1024000
     },
-    path: '${value| bytes}',
-    filter: '',
+    path: '${value}',
+    filter: '| bytes',
     expectValue: '1.02 MB'
   },
   {
@@ -191,8 +191,8 @@ const filters = [
     data: {
       value: -1024
     },
-    path: '${value| bytes}',
-    filter: '',
+    path: '${value}',
+    filter: '| bytes',
     expectValue: '-1.02 KB'
   },
   {
@@ -200,8 +200,8 @@ const filters = [
     data: {
       value: 0.5
     },
-    path: '${value| bytes}',
-    filter: '',
+    path: '${value}',
+    filter: '| bytes',
     expectValue: '0.5 B'
   },
   // round
@@ -210,8 +210,8 @@ const filters = [
     data: {
       value: '啥啊'
     },
-    path: '${value| round}',
-    filter: '',
+    path: '${value}',
+    filter: '| round',
     expectValue: 0
   },
   {
@@ -219,8 +219,8 @@ const filters = [
     data: {
       value: 1.22
     },
-    path: '${value| round:1}',
-    filter: '',
+    path: '${value}',
+    filter: '| round:1',
     expectValue: '1.2'
   },
   {
@@ -228,8 +228,8 @@ const filters = [
     data: {
       value: 1.26
     },
-    path: '${value| round:1}',
-    filter: '',
+    path: '${value}',
+    filter: '| round:1',
     expectValue: '1.3'
   },
   {
@@ -237,8 +237,8 @@ const filters = [
     data: {
       value: 'this is a very loooooong sentence.'
     },
-    path: '${value| truncate:10}',
-    filter: '',
+    path: '${value}',
+    filter: '| truncate:10',
     expectValue: 'this is a ...'
   },
   {
@@ -246,8 +246,8 @@ const filters = [
     data: {
       value: 'this is a very loooooong sentence.'
     },
-    path: '${value| truncate:null}',
-    filter: '',
+    path: '${value}',
+    filter: '| truncate:null',
     expectValue: 'this is a very loooooong sentence.'
   },
   {
@@ -255,8 +255,8 @@ const filters = [
     data: {
       value: 'http://www.baidu.com?query=123'
     },
-    path: '${value| url_encode}',
-    filter: '',
+    path: '${value}',
+    filter: '| url_encode',
     expectValue: 'http%3A%2F%2Fwww.baidu.com%3Fquery%3D123'
   },
   {
@@ -264,8 +264,8 @@ const filters = [
     data: {
       value: 'http%3A%2F%2Fwww.baidu.com%3Fquery%3D123'
     },
-    path: '${value| url_decode:10}',
-    filter: '',
+    path: '${value}',
+    filter: '| url_decode:10',
     expectValue: 'http://www.baidu.com?query=123'
   },
   {
@@ -273,8 +273,8 @@ const filters = [
     data: {
       value: ''
     },
-    path: '${value| default}',
-    filter: '',
+    path: '${value}',
+    filter: '| default',
     expectValue: undefined
   },
   {
@@ -282,8 +282,8 @@ const filters = [
     data: {
       value: ''
     },
-    path: '${value| default:-}',
-    filter: '',
+    path: '${value}',
+    filter: '| default:-',
     expectValue: '-'
   },
   {
@@ -291,8 +291,8 @@ const filters = [
     data: {
       value: ['a', 'b', 'c']
     },
-    path: '${value| join:,}',
-    filter: '',
+    path: '${value}',
+    filter: '| join:,',
     expectValue: 'a,b,c'
   },
   {
@@ -300,8 +300,8 @@ const filters = [
     data: {
       value: 'a,b,c'
     },
-    path: '${value| split}',
-    filter: '',
+    path: '${value}',
+    filter: '| split',
     expectValue: ['a', 'b', 'c']
   },
   {
@@ -309,8 +309,8 @@ const filters = [
     data: {
       value: ['a', 'b', 'c']
     },
-    path: '${value| first}',
-    filter: '',
+    path: '${value}',
+    filter: '| first',
     expectValue: 'a'
   },
   {
@@ -318,8 +318,8 @@ const filters = [
     data: {
       value: ['a', 'b', 'c']
     },
-    path: '${value| nth:1}',
-    filter: '',
+    path: '${value}',
+    filter: '| nth:1',
     expectValue: 'b'
   },
   {
@@ -327,8 +327,8 @@ const filters = [
     data: {
       value: ['a', 'b', 'c']
     },
-    path: '${value| last}',
-    filter: '',
+    path: '${value}',
+    filter: '| last',
     expectValue: 'c'
   },
   {
@@ -336,8 +336,8 @@ const filters = [
     data: {
       value: 5
     },
-    path: '${value| minus:1}',
-    filter: '',
+    path: '${value}',
+    filter: '| minus:1',
     expectValue: 4
   },
   {
@@ -345,8 +345,8 @@ const filters = [
     data: {
       value: 5
     },
-    path: '${value| plus:1}',
-    filter: '',
+    path: '${value}',
+    filter: '| plus:1',
     expectValue: 6
   },
   {
@@ -357,8 +357,8 @@ const filters = [
         b: '2'
       }
     },
-    path: '${value| pick:a}',
-    filter: '',
+    path: '${value}',
+    filter: '| pick:a',
     expectValue: '1'
   },
   {
@@ -379,8 +379,8 @@ const filters = [
         }
       ]
     },
-    path: '${value| pick:value}',
-    filter: '',
+    path: '${value}',
+    filter: '| pick:value',
     expectValue: ['a', 'b', 'c']
   },
   {
@@ -401,8 +401,8 @@ const filters = [
         }
       ]
     },
-    path: '${value| pick_if_exist:value}',
-    filter: '',
+    path: '${value}',
+    filter: '| pick_if_exist:$value',
     expectValue: ['a', 'b', 'c']
   },
   {
@@ -410,8 +410,8 @@ const filters = [
     data: {
       value: '1559649981'
     },
-    path: '${value| str2date:X:YYYY-MM-DD HH-mm-ss}',
-    filter: '',
+    path: '${value}',
+    filter: '| str2date:X:YYYY-MM-DD HH-mm-ss',
     expectValue: moment('1559649981', 'X').format('YYYY-MM-DD HH-mm-ss')
   },
   {
@@ -419,8 +419,8 @@ const filters = [
     data: {
       value: 'a'
     },
-    path: '${value| asArray}',
-    filter: '',
+    path: '${value}',
+    filter: '| asArray',
     expectValue: ['a']
   },
   {
@@ -428,8 +428,8 @@ const filters = [
     data: {
       value: 'I love amis'
     },
-    path: '${value| base64Encode}',
-    filter: '',
+    path: '${value}',
+    filter: '| base64Encode',
     expectValue: 'SSBsb3ZlIGFtaXM='
   },
   {
@@ -437,8 +437,8 @@ const filters = [
     data: {
       value: 'SSBsb3ZlIGFtaXM='
     },
-    path: '${value| base64Decode}',
-    filter: '',
+    path: '${value}',
+    filter: '| base64Decode',
     expectValue: 'I love amis'
   },
   {
@@ -446,8 +446,8 @@ const filters = [
     data: {
       value: 'AbC'
     },
-    path: '${value| lowerCase}',
-    filter: '',
+    path: '${value}',
+    filter: '| lowerCase',
     expectValue: 'abc'
   },
   {
@@ -455,8 +455,8 @@ const filters = [
     data: {
       value: 'aBc'
     },
-    path: '${value| upperCase}',
-    filter: '',
+    path: '${value}',
+    filter: '| upperCase',
     expectValue: 'ABC'
   }
 ];

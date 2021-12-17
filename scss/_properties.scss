@@ -5,8 +5,8 @@
   --white: #{$white};
   // 因为运行不支持颜色计算，所以用 css 变量的方式需要多定义几个变量
   --primary: #{$primary};
-  --primary-onHover: #4f86f4;
-  --primary-onActive: #1c53c1;
+  --primary-onHover: #{darken($primary, 7.5%)};
+  --primary-onActive: #{darken($primary, 10%)};
   --secondary: #{$secondary};
   --secondary-onHover: #{darken($secondary, 7.5%)};
   --secondary-onActive: #{darken($secondary, 10%)};
@@ -68,7 +68,6 @@
 
   --fontWeightNormal: 400;
   --fontWeightBase: var(--fontWeightNormal);
-  --fontWeightMd: 500;
   --fontWeightBold: 700;
 
   --background: var(--white);
@@ -167,10 +166,6 @@
 
   --Badge-size: var(--gap-md);
   --Badge-color: var(--white);
-  --Badge--success-bg: var(--success);
-  --Badge--info-bg: var(--info);
-  --Badge--warning-bg: var(--warning);
-  --Badge--danger-bg: var(--danger);
 
   --Button--danger-bg: var(--danger);
   --Button--danger-border: var(--Button--danger-bg);
@@ -193,12 +188,12 @@
   --Button--default-bg: var(--white);
   --Button--default-border: var(--borderColor);
   --Button--default-color: var(--text-color);
-  --Button--default-onActive-bg: var(--white);
-  --Button--default-onActive-border: var(--primary-onActive);
-  --Button--default-onActive-color: var(--primary-onActive);
-  --Button--default-onHover-bg: var(--white);
-  --Button--default-onHover-border: var(--primary);
-  --Button--default-onHover-color: var(--primary);
+  --Button--default-onActive-bg: #{darken($white, 10%)};
+  --Button--default-onActive-border: #{darken($borderColor, 12.5%)};
+  --Button--default-onActive-color: var(--Button--default-color);
+  --Button--default-onHover-bg: #{darken($white, 7.5%)};
+  --Button--default-onHover-border: #{darken($borderColor, 10%)};
+  --Button--default-onHover-color: var(--Button--default-color);
   --Button--iconOnly-minWidthRate: 4 / 3;
   --Button--info-bg: var(--info);
   --Button--info-border: var(--Button--info-bg);
@@ -231,8 +226,7 @@
   --Button--light-onHover-color: var(--Button--light-color);
   --Button--link-color: var(--primary);
   --Button--link-onDisabled-color: #{$gray600};
-  --Button--link-onHover-color: var(--primary-onHover);
-  --Button--link-onActive-color: var(--primary-onActive);
+  --Button--link-onHover-color: var(--text--loud-color);
   --Button--md-fontSize: var(--Button-fontSize);
   --Button--md-height: var(--Button-height);
   --Button--md-lineHeight: var(--Button-lineHeight);
@@ -247,10 +241,10 @@
   --Button--primary-border: var(--Button--primary-bg);
   --Button--primary-color: var(--button-color);
   --Button--primary-onActive-bg: var(--primary-onActive);
-  --Button--primary-onActive-border: var(--primary-onActive);
+  --Button--primary-onActive-border: #{darken($primary, 12.5%)};
   --Button--primary-onActive-color: var(--Button--primary-color);
   --Button--primary-onHover-bg: var(--primary-onHover);
-  --Button--primary-onHover-border: var(--primary-onHover);
+  --Button--primary-onHover-border: var(--primary-onActive);
   --Button--primary-onHover-color: var(--Button--primary-color);
   --Button--secondary-bg: var(--secondary);
   --Button--secondary-border: var(--Button--secondary-bg);
@@ -281,14 +275,6 @@
   --Button--success-onHover-bg: var(--success-onHover);
   --Button--success-onHover-border: var(--success-onActive);
   --Button--success-onHover-color: var(--Button--success-color);
-  --Button--enhance-border: var(--primary);
-  --Button--enhance-color: var(--primary);
-  --Button--enhance-onActive-bg: var(--white);
-  --Button--enhance-onActive-border: var(--primary-onActive);
-  --Button--enhance-onActive-color: var(--primary-onActive);
-  --Button--enhance-onHover-bg: var(--white);
-  --Button--enhance-onHover-border: var(--primary-onHover);
-  --Button--enhance-onHover-color: var(--primary-onHover);
   --Button--warning-bg: var(--warning);
   --Button--warning-border: var(--Button--warning-bg);
   --Button--warning-color: var(--button-color);
@@ -319,16 +305,12 @@
   --Button-lineHeight: var(--Form-input-lineHeight);
   --Button-mimWidth: auto;
   --Button-onActive-boxShadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --Button-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-  --Button-animation-spin: spin 1s infinite linear;
   --Button-onActive-color: var(--primary);
   --Button-onActive-border: var(--primary);
   --Button-onDisabled-borderColor: #dee2e6;
   --Button-onDisabled-opacity: 0.65;
-  --Button-onDisabled-bg: #f2f3f3;
   --Button-onFocus-boxShadow: none;
   --Button-paddingX: #{px2rem(12px)};
-  --Button-paddingX-right: #{px2rem(10px)};
   --Button-paddingY: calc(
     (
         var(--Button-height) - var(--Button-borderWidth) * 2 -
@@ -402,15 +384,6 @@
   --Calendar-shortcuts-height: #{px2rem(30px)};
   --Calendar-wLabel-color: #999;
 
-  --Calendar-icon-bottom: #{px2rem(-4px)};
-  --Calendar-icon-width: #{px2rem(10px)};
-  --Calendar-icon-height: #{px2rem(10px)};
-  --Calendar-borderWidth: #{px2rem(1px)};
-  --Calendar-rdt-day: #{px2rem(100px)};
-  --Calendar-schedule-content-padding: 0 #{px2rem(4px)};
-  --Calendar-schedule-content-height: #{px2rem(20px)};
-  --Calendar-schedule-content-color: #{$white};
-
   --Card-actions-borderColor: #{lighten($borderColor, 5%)};
   --Card-actions-fontSize: var(--fontSizeBase);
   --Card-actions-onChecked-onHover-bg: #{darken(#d9f3fb, 5%)};
@@ -421,7 +394,6 @@
   --Card-borderColor: var(--borderColor);
   --Card-borderRadius: var(--borderRadius);
   --Card-borderWidth: var(--borderWidth);
-  --Card-secondary-color: #83868c;
   --Card-onChecked-bg: #d9f3fb;
   --Card-onChecked-borderColor: #{darken(#d9f3fb, 10%)};
   --Card-onChecked-color: #{darken(#d9f3fb, 40%)};
@@ -492,7 +464,6 @@
       ) / 2 - var(--ColorPicker-borderWidth)
   );
   --ColorPicker-placeholderColor: var(--Form-input-placeholderColor);
-  --ColorPicker-boxShadow: var(--boxShadow);
 
   --Combo--horizontal-dragger-top: var(--Form-label-paddingTop);
   --Combo--horizontal-item-gap: var(--gap-xs);
@@ -535,25 +506,6 @@
   --Copyable-iconColor: var(--icon-color);
   --Copyable-onHover-iconColor: var(--icon-onHover-color);
 
-  --Collapse-border: none;
-  --Collapse-border-color: var(--borderColorLight);
-  --Collapse-header-fontSize: var(--fontSizeMd);
-  --Collapse-header-fontWeight: var(--fontWeightNormal);
-  --Collapse-header-padding: #{px2rem(18px)} 0 var(--gap-xs) 0;
-  --Collapse-header-bg: transparent;
-  --Collapse-header-onHover-bg: transparent;
-  --Collapse-header-collapsed-border: var(--borderWidth) solid
-    var(--Collapse-border-color);
-  --Collapse-header-collapsed-borderTop: none;
-  --Collapse-header-collapsed-borderBottom: var(
-    --Collapse-header-collapsed-border
-  );
-  --Collapse-header-wrapper-direction: row;
-  --Collapse-content-padding: #{px2rem(18px)} 0;
-  --Collapse-content-color: var(--body-color);
-  --Collapse-content-fontSize: var(--body-size);
-  --Collapse-content-fontWeight: var(--body-weight);
-
   --Crud-toolbar-gap: var(--gap-xs);
   --Crud-toolbar-height: #{px2rem(30px)};
   --Crud-toolbar-lineHeight: var(--lineHeightBase);
@@ -581,9 +533,7 @@
   );
   --DatePicker-placeholderColor: var(--Form-input-placeholderColor);
 
-  --LocationPicker-borderRadius: var(--Form-input-borderWidth);
-
-  --Divider-borderStyle: solid;
+  --Divider-borderStyle: dashed;
 
   --Drawer-bg: var(--background);
   --Drawer-body-padding: var(--gap-base);
@@ -618,9 +568,8 @@
   --DropDown-menu-paddingX: 0;
   --DropDown-menu-paddingY: var(--gap-xs);
   --DropDown-menuItem-onHover-bg: var(--ListMenu-item--onHover-bg);
-  --DropDown-menuItem-color: var(--text-color);
-  --DropDown-menuItem-onHover-color: var(--primary);
-  --DropDown-menuItem-onActive-color: var(--primary);
+  --DropDown-menuItem-onHover-color: inherit;
+  --DropDown-menuItem-onActive-color: var(--info);
   --DropDown-menuItem-onDisabled-color: var(--text--muted-color);
   --DropDown-menuItem-paddingX: var(--gap-sm);
   --DropDown-menuItem-paddingY: calc(
@@ -690,7 +639,6 @@
       ) / 2
   );
   --Form-input-placeholderColor: var(--text--muted-color);
-  --Form-input-onDisabled-color: var(--text--muted-color);
 
   --Form-item-gap: var(--gap-base);
 
@@ -760,7 +708,6 @@
 
   --ImageControl-addBtn-bg: var(--Button--default-bg);
   --ImageControl-addBtn-border: var(--Button--default-border);
-  --ImageControl-addBtn-borderRadius: 0;
   --ImageControl-addBtn-color: var(--Button--default-color);
   --ImageControl-addBtn-onActive-bg: #{darken($white, 10%)};
   --ImageControl-addBtn-onActive-border: #{darken($borderColor, 12.5%)};
@@ -773,9 +720,6 @@
   --ImageControl-addBtn-onHover-bg: #{darken($white, 7.5%)};
   --ImageControl-addBtn-onHover-border: #{darken($borderColor, 10%)};
   --ImageControl-addBtn-onHover-color: var(--Button--default-color);
-  --ImageControl-progress-borderRadius: 0;
-
-  --FileControl-progress-borderRadius: 0;
 
   --InputGroup-addOn-bg: var(--Form-input-addOnBg);
   --InputGroup-addOn-borderColor: var(--Form-input-borderColor);
@@ -896,7 +840,6 @@
   --ListControl-item-bg: var(--white);
   --ListControl-item-borderColor: var(--borderColor);
   --ListControl-item-borderWidth: var(--borderWidth);
-  --ListControl-item-borderRadius: #{px2rem(3px)};
   --ListControl-item-color: var(--text-color);
   --ListControl-item-onActive-after-borderColor: var(--primary);
   --ListControl-item-onActive-before-bg: var(--white);
@@ -929,8 +872,6 @@
   --ListItem-onModified-fieldLabel-color: #{lighten(#4285f4, 20%)};
   --ListItem-paddingX: var(--gap-base);
   --ListItem-paddingY: var(--gap-sm);
-  --ListItem--onHover-bg: rgba(0, 126, 255, 0.08);
-  --ListItem--onHover-color: var(--info);
 
   --listMenu--onActive-borderColor: var(--info);
   --ListMenu-borderRadius: #{px2rem(2px)};
@@ -1085,31 +1026,12 @@
   --Picker-iconColor: var(--icon-color);
   --Picker-onHover-iconColor: var(--icon-onHover-color);
 
-  --PickerColumns-bg: white;
-  --PickerColumns-toolbar-height: #{px2rem(50px)};
-  --PickerColumns-title-fontSize: var(--fontSizeLg);
-  --PickerColumns-title-lineHeight: 1.5;
-  --PickerColumns-action-padding: 0 var(--gap-sm);
-  --PickerColumns-action-fontSize: var(--fontSizeMd);
-  --PickerColumns-confirmAction-color: #{lighten($text-color, 25%)};
-  --PickerColumns-cancelAction-color: #{lighten($text-color, 50%)};
-  --PickerColumns-option-fontSize: var(--fontSizeLg);
-  --PickerColumns-optionText-color: var(--text-color);
-  --PickerColumns-optionDisabled-opacity: 0.3;
-  --PickerColumns-loadingIcon-color: var(--icon-color);
-  --PickerColumns-loadingMask-Color: rgba(255, 255, 255, 0.9);
-
   --PopOver-bg: white;
   --PopOverAble-iconColor: inherit;
   --PopOverAble-onHover-iconColor: inherit;
 
   --Property-title-bg: #f2f2f2;
   --Property-label-bg: #f7f7f7;
-
-  --Portlet-borderColor: var(--borderColor);
-  --Portlet-borderStyle: solid;
-  --Portlet-borderWidth: var(--borderWidth);
-  --Portlet-borderRadius: var(--borderRadius);
 
   --QuickEdit-iconColor: inherit;
   --QuickEdit-onFocus-borderColor: var(--info);
@@ -1214,8 +1136,6 @@
   --Table-toolbar-marginX: 0;
   --Table-toolbar-marginY: var(--gap-base);
   --Table-tree-borderColor: var(--Table-borderColor);
-  --Table-searchableForm-backgroundColor: #f6f7f8;
-  --Table-searchableForm-borderRadius: #{px2rem(4px)};
 
   --TableCell--edge-paddingX: var(--gap-md);
   --TableCell-filterBtn--onActive-color: var(--primary);
@@ -1302,32 +1222,31 @@
   );
   --TagControl-sugTip-color: var(--info);
 
-  --Toast-color: var(--text-color);
-  --Toast--danger-bgColor: var(--background);
-  --Toast--danger-borderColor: transparent;
+  --Toast--danger-bgColor: var(--danger);
+  --Toast--danger-borderColor: var(--danger);
   --Toast--danger-color: var(--Toast-color);
-  --Toast--info-bgColor: var(--background);
-  --Toast--info-borderColor: transparent;
+  --Toast--info-bgColor: var(--info);
+  --Toast--info-borderColor: var(--info);
   --Toast--info-color: var(--Toast-color);
-  --Toast--success-bgColor: var(--background);
-  --Toast--success-borderColor: transparent;
+  --Toast--success-bgColor: var(--success);
+  --Toast--success-borderColor: var(--success);
   --Toast--success-color: var(--Toast-color);
-  --Toast--warning-bgColor: var(--background);
-  --Toast--warning-borderColor: transparent;
+  --Toast--warning-bgColor: var(--warning);
+  --Toast--warning-borderColor: var(--warning);
   --Toast--warning-color: var(--Toast-color);
-
   --Toast-border-width: 0;
-  --Toast-borderRadius: #{px2rem(2px)};
+  --Toast-borderRadius: var(--borderRadiusLg);
   --Toast-box-shadow: var(--boxShadow);
-  --Toast-close-color: var(--icon-color);
   --Toast-close--onHover-color: var(--Toast-close-color);
+  --Toast-close-color: var(--white);
+  --Toast-color: var(--white);
 
   --Toast-icon-width: #{px2rem(16px)};
   --Toast-icon-height: var(--Toast-icon-width);
 
   --Toast-opacity: 0.8;
   --Toast-paddingL: #{px2rem(40px)};
-  --Toast-paddingX: var(--gap-md);
+  --Toast-paddingX: var(--gap-sm);
   --Toast-paddingY: var(--gap-xs);
   --Toast-title-display: block;
   --Toast-width: #{px2rem(300px)};
@@ -1415,16 +1334,4 @@
   --Steps-sub-title-color: var(--text-color);
   --Steps-line-bg: var(--Steps-bg);
   --Steps-line-success-bg: var(--Steps-status-success);
-
-  --Progress-borderRadius: var(--borderRadius);
-  --Progress-animate-backgroundColor: #fff;
-  --Progress-bar-backgroundColor: #d3d9e6;
-
-  --ColumnToggler-backgroundColor: var(--white);
-  --ColumnToggler-borderRadius: #{px2rem(4px)};
-  --ColumnToggler-lineHeight: #{px2rem(24px)};
-  --ColumnToggler-title-fontColor: #080e1a;
-  --ColumnToggler-fontColor: #151a26;
-  --ColumnToggler-item-backgroundColor: #f6f7f8;
-  --ColumnToggler-item-backgroundColor-onHover: rgba(36, 104, 242, 0.1);
 }

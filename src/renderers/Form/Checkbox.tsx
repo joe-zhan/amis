@@ -2,7 +2,6 @@ import React from 'react';
 import {FormItem, FormControlProps, FormBaseControl} from './Item';
 import cx from 'classnames';
 import Checkbox from '../../components/Checkbox';
-import {withBadge, BadgeSchema} from '../../components/Badge';
 
 /**
  * Checkbox 勾选框。
@@ -28,11 +27,6 @@ export interface CheckboxControlSchema extends FormBaseControl {
    * 选项说明
    */
   option?: string;
-
-  /**
-   * 角标
-   */
-  badge?: BadgeSchema;
 }
 
 export interface CheckboxProps
@@ -84,6 +78,4 @@ export default class CheckboxControl extends React.Component<
   type: 'checkbox',
   sizeMutable: false
 })
-// @ts-ignore
-@withBadge
 export class CheckboxControlRenderer extends CheckboxControl {}

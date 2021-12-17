@@ -440,15 +440,7 @@ export class MonthRangePicker extends React.Component<
   }
 
   renderCalendar() {
-    const {
-      classPrefix: ns,
-      classnames: cx,
-      locale,
-      embed,
-      ranges,
-      inputFormat,
-      timeFormat
-    } = this.props;
+    const {classPrefix: ns, classnames: cx, locale, embed, ranges, inputFormat, timeFormat} = this.props;
     const __ = this.props.translate;
     const viewMode: 'months' = 'months';
     const dateFormat = 'YYYY-MM';
@@ -600,7 +592,7 @@ export class MonthRangePicker extends React.Component<
         ) : null}
 
         <a className={`${ns}DateRangePicker-toggler`}>
-          <Icon icon="clock" className="icon" />
+          <Icon icon="calendar" className="icon" />
         </a>
 
         {isOpened ? (

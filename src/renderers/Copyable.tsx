@@ -32,56 +32,54 @@ export interface CopyableProps extends RendererProps {
   copyable: SchemaCopyable;
 }
 
-export const HocCopyable =
-  () =>
-  (Component: React.ComponentType<any>): any => {
-    class QuickEditComponent extends React.PureComponent<CopyableProps, any> {
-      static ComposedComponent = Component;
-      handleClick(content: string) {
-        const {env, copyFormat} = this.props;
-        env.copy && env.copy(content, {format: copyFormat});
-      }
-      render() {
-        const {
-          copyable,
-          name,
-          className,
-          data,
-          noHoc,
-          classnames: cx,
-          translate: __
-        } = this.props;
-
-        if (copyable && !noHoc) {
-          const content = filter(
-            (copyable as SchemaCopyableObject).content ||
-              '${' + name + ' | raw }',
-            data
-          );
-          if (content) {
-            return (
-              <Component
-                {...this.props}
-                className={cx(`Field--copyable`, className)}
-              >
-                <Component {...this.props} wrapperComponent={''} noHoc />
-                <a
-                  key="edit-btn"
-                  data-tooltip={__('Copyable.tip')}
-                  className={cx('Field-copyBtn')}
-                  onClick={this.handleClick.bind(this, content)}
-                >
-                  <Icon icon="copy" className="icon" />
-                </a>
-              </Component>
-            );
-          }
-        }
-        return <Component {...this.props} />;
-      }
+export const HocCopyable = () => (Component: React.ComponentType<any>): any => {
+  class QuickEditComponent extends React.PureComponent<CopyableProps, any> {
+    static ComposedComponent = Component;
+    handleClick(content: string) {
+      const {env} = this.props;
+      env.copy && env.copy(content);
     }
-    hoistNonReactStatic(QuickEditComponent, Component);
-    return QuickEditComponent;
-  };
+    render() {
+      const {
+        copyable,
+        name,
+        className,
+        data,
+        noHoc,
+        classnames: cx,
+        translate: __
+      } = this.props;
+
+      if (copyable && !noHoc) {
+        const content = filter(
+          (copyable as SchemaCopyableObject).content ||
+            '${' + name + ' | raw }',
+          data
+        );
+        if (content) {
+          return (
+            <Component
+              {...this.props}
+              className={cx(`Field--copyable`, className)}
+            >
+              <Component {...this.props} wrapperComponent={''} noHoc />
+              <a
+                key="edit-btn"
+                data-tooltip={__('Copyable.tip')}
+                className={cx('Field-copyBtn')}
+                onClick={this.handleClick.bind(this, content)}
+              >
+                <Icon icon="copy" className="icon" />
+              </a>
+            </Component>
+          );
+        }
+      }
+      return <Component {...this.props} />;
+    }
+  }
+  hoistNonReactStatic(QuickEditComponent, Component);
+  return QuickEditComponent;
+};
 
 export default HocCopyable;

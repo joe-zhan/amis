@@ -147,7 +147,6 @@ export default class TreeControl extends React.Component<TreeProps> {
       rootCreatable,
       rootCreateTip,
       labelField,
-      iconField,
       nodePath,
       deferLoad,
       expandTreeOptions,
@@ -164,7 +163,6 @@ export default class TreeControl extends React.Component<TreeProps> {
             classPrefix={ns}
             labelField={labelField}
             valueField={valueField}
-            iconField={iconField}
             disabled={disabled}
             onChange={onChange}
             joinValues={joinValues}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PopOverContainer from '../PopOverContainer';
 import {Icon} from '../icons';
-import GroupedSelection from '../GroupedSelection';
+import ListRadios from '../ListRadios';
 import {ClassNamesFn, themeable, ThemeProps} from '../../theme';
 
 export interface InputSwitchProps extends ThemeProps {
@@ -23,13 +23,13 @@ export function InputSwitch({
   return (
     <PopOverContainer
       popOverRender={({onClose}) => (
-        <GroupedSelection
+        <ListRadios
           onClick={onClose}
           option2value={option2value}
           onChange={onChange}
           options={options}
           value={value}
-          multiple={false}
+          showRadio={false}
           disabled={disabled}
         />
       )}

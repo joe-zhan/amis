@@ -5,11 +5,9 @@ import {SchemaNode, Action, Schema} from '../../types';
 import forEach from 'lodash/forEach';
 import {filter} from '../../utils/tpl';
 import DropDownButton from '../DropDownButton';
-import './ColumnToggler';
 import Checkbox from '../../components/Checkbox';
 import Button from '../../components/Button';
 import {TableStore, ITableStore, IColumn, IRow} from '../../store/table';
-import {saveAs} from 'file-saver';
 import {
   anyChanged,
   getScrollParent,
@@ -18,10 +16,7 @@ import {
   autobind,
   isArrayChildrenModified,
   getVariable,
-  removeHTMLTag,
-  eachTree,
-  isObject,
-  createObject
+  removeHTMLTag
 } from '../../utils/helper';
 import {
   isPureVariable,
@@ -40,7 +35,6 @@ import {HeadCellSearchDropDown} from './HeadCellSearchDropdown';
 import {TableContent} from './TableContent';
 import {
   BaseSchema,
-  SchemaApi,
   SchemaClassName,
   SchemaObject,
   SchemaTokenizeableString,
@@ -55,10 +49,6 @@ import {TableBody} from './TableBody';
 import {TplSchema} from '../Tpl';
 import {MappingSchema} from '../Mapping';
 import {isAlive, getSnapshot} from 'mobx-state-tree';
-import ColumnToggler from './ColumnToggler';
-import {BadgeSchema} from '../../components/Badge';
-import offset from '../../utils/offset';
-import {getStyleNumber} from '../../utils/dom';
 
 /**
  * 表格列，不指定类型时默认为文本类型。
@@ -107,7 +97,7 @@ export type TableColumnObject = {
   /**
    * 是否可快速搜索
    */
-  searchable?: boolean | SchemaObject;
+  searchable?: boolean;
 
   /**
    * 配置是否默认展示
@@ -118,26 +108,6 @@ export type TableColumnObject = {
    * 列宽度
    */
   width?: number | string;
-
-  /**
-   * 列对齐方式
-   */
-  align?: 'left' | 'right' | 'center' | 'justify';
-
-  /**
-   * 列样式表
-   */
-  className?: string;
-
-  /**
-   * 单元格样式表达式
-   */
-  classNameExpr?: string;
-
-  /**
-   * 列头样式表
-   */
-  labelClassName?: string;
 
   /**
    * todo
@@ -159,16 +129,6 @@ export type TableColumnObject = {
    * 提示信息
    */
   remark?: SchemaRemark;
-
-  /**
-   * 默认值, 只有在 inputTable 里面才有用
-   */
-  value?: any;
-
-  /**
-   * 是否唯一, 只有在 inputTable 里面才有用
-   */
-  unique?: boolean;
 };
 
 export type TableColumnWithType = SchemaObject & TableColumnObject;
@@ -282,21 +242,6 @@ export interface TableSchema extends BaseSchema {
    * 是否可调整列宽
    */
   resizable?: boolean;
-
-  /**
-   * 行样式表表达式
-   */
-  rowClassNameExpr?: string;
-
-  /**
-   * 行角标
-   */
-  itemBadge?: BadgeSchema;
-
-  /**
-   * 开启查询区域，会根据列元素的searchable属性值，自动生成查询条件表单
-   */
-  autoGenerateFilter?: boolean;
 }
 
 export interface TableProps extends RendererProps {
@@ -364,14 +309,7 @@ export interface TableProps extends RendererProps {
   popOverContainer?: any;
   canAccessSuperData?: boolean;
   reUseRow?: boolean;
-  itemBadge?: BadgeSchema;
 }
-
-type ExportExcelToolbar = SchemaNode & {
-  api?: SchemaApi;
-  columns?: string[];
-  filename?: string;
-};
 
 /**
  * 将 url 转成绝对地址
@@ -411,7 +349,6 @@ export default class Table extends React.Component<TableProps, object> {
     'itemDraggableOn',
     'checkOnItemClick',
     'hideCheckToggler',
-    'itemAction',
     'itemActions',
     'combineNum',
     'combineFromIndex',
@@ -424,9 +361,7 @@ export default class Table extends React.Component<TableProps, object> {
     'popOverContainer',
     'headerToolbarClassName',
     'toolbarClassName',
-    'footerToolbarClassName',
-    'itemBadge',
-    'autoFillHeight'
+    'footerToolbarClassName'
   ];
   static defaultProps: Partial<TableProps> = {
     className: '',
@@ -499,9 +434,6 @@ export default class Table extends React.Component<TableProps, object> {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
     this.subFormRef = this.subFormRef.bind(this);
-    this.handleColumnToggle = this.handleColumnToggle.bind(this);
-    this.renderAutoFilterForm = this.renderAutoFilterForm.bind(this);
-    this.updateAutoFillHeight = this.updateAutoFillHeight.bind(this);
 
     const {
       store,
@@ -612,68 +544,6 @@ export default class Table extends React.Component<TableProps, object> {
     this.affixDetect();
     parent.addEventListener('scroll', this.affixDetect);
     window.addEventListener('resize', this.affixDetect);
-    this.updateAutoFillHeight();
-    window.addEventListener('resize', this.updateAutoFillHeight);
-  }
-
-  /**
-   * 自动设置表格高度占满界面剩余区域
-   * 用 css 实现有点麻烦，要改很多结构，所以先用 dom hack 了，避免对之前的功能有影响
-   */
-  updateAutoFillHeight() {
-    const {autoFillHeight, footerToolbar, classPrefix: ns} = this.props;
-    if (!autoFillHeight) {
-      return;
-    }
-    const table = findDOMNode(this) as HTMLElement;
-    const tableContent = table.querySelector(
-      `.${ns}Table-content`
-    ) as HTMLElement;
-    const tableContentWrap = table.querySelector(
-      `.${ns}Table-contentWrap`
-    ) as HTMLElement;
-    const footToolbar = table.querySelector(
-      `.${ns}Table-footToolbar`
-    ) as HTMLElement;
-    if (!tableContent) {
-      return;
-    }
-
-    // 计算 table-content 在 dom 中的位置
-    const tableContentTop = offset(tableContent).top;
-    const viewportHeight = window.innerHeight;
-    // 有时候会拿不到 footToolbar？
-    const footToolbarHeight = footToolbar ? offset(footToolbar).height : 0;
-    // 有时候会拿不到 footToolbar，等一下在执行
-    if (!footToolbarHeight && footerToolbar && footerToolbar.length) {
-      setTimeout(() => {
-        this.updateAutoFillHeight();
-      }, 100);
-      return;
-    }
-    const tableContentWrapMarginButtom = getStyleNumber(
-      tableContentWrap,
-      'margin-bottom'
-    );
-
-    // 循环计算父级节点的 pddding，这里不考虑父级节点还可能会有其它兄弟节点的情况了
-    let allParentPaddingButtom = 0;
-    let parentNode = tableContent.parentElement;
-    while (parentNode) {
-      const paddingButtom = getStyleNumber(parentNode, 'padding-bottom');
-      const borderBottom = getStyleNumber(parentNode, 'border-bottom-width');
-      allParentPaddingButtom =
-        allParentPaddingButtom + paddingButtom + borderBottom;
-      parentNode = parentNode.parentElement;
-    }
-
-    tableContent.style.height = `${
-      viewportHeight -
-      tableContentTop -
-      tableContentWrapMarginButtom -
-      footToolbarHeight -
-      allParentPaddingButtom
-    }px`;
   }
 
   componentDidUpdate(prevProps: TableProps) {
@@ -742,12 +612,8 @@ export default class Table extends React.Component<TableProps, object> {
     ) {
       Table.syncRows(store, props, prevProps) && this.syncSelected();
     } else if (isArrayChildrenModified(prevProps.selected!, props.selected!)) {
-      const prevSelectedRows = store.selectedRows
-        .map(item => item.id)
-        .join(',');
       store.updateSelected(props.selected || [], props.valueField);
-      const selectedRows = store.selectedRows.map(item => item.id).join(',');
-      prevSelectedRows !== selectedRows && this.syncSelected();
+      this.syncSelected();
     }
 
     this.updateTableInfoLazy();
@@ -759,7 +625,6 @@ export default class Table extends React.Component<TableProps, object> {
     const parent = this.parentNode;
     parent && parent.removeEventListener('scroll', this.affixDetect);
     window.removeEventListener('resize', this.affixDetect);
-    window.removeEventListener('resize', this.updateAutoFillHeight);
     (this.updateTableInfoLazy as any).cancel();
     this.unSensor && this.unSensor();
 
@@ -781,14 +646,8 @@ export default class Table extends React.Component<TableProps, object> {
     onAction(e, action, ctx);
   }
 
-  handleCheck(item: IRow, value: boolean, shift?: boolean) {
-    const {store} = this.props;
-    if (shift) {
-      store.toggleShift(item);
-    } else {
-      item.toggle();
-    }
-
+  handleCheck(item: IRow) {
+    item.toggle();
     this.syncSelected();
   }
 
@@ -949,7 +808,7 @@ export default class Table extends React.Component<TableProps, object> {
   }
 
   affixDetect() {
-    if (!this.props.affixHeader || !this.table || this.props.autoFillHeight) {
+    if (!this.props.affixHeader || !this.table) {
       return;
     }
 
@@ -1203,7 +1062,7 @@ export default class Table extends React.Component<TableProps, object> {
 
   handleMouseMove(e: React.MouseEvent<any>) {
     const tr: HTMLElement = (e.target as HTMLElement).closest(
-      'tr[data-id]'
+      'tr[data-index]'
     ) as HTMLElement;
 
     if (!tr) {
@@ -1221,20 +1080,20 @@ export default class Table extends React.Component<TableProps, object> {
       return;
     }
 
-    const id = tr.getAttribute('data-id') as string;
-    const row = store.hoverRow;
+    const index = parseInt(tr.getAttribute('data-index') as string, 10);
 
-    if (row?.id === id) {
+    if (store.hoverIndex === index) {
       return;
     }
-    eachTree<IRow>(store.rows, (item: IRow) => item.setIsHover(item.id === id));
+    store.rows.forEach((item, key) => item.setIsHover(index === key));
   }
 
   handleMouseLeave() {
     const store = this.props.store;
-    const row = store.hoverRow;
 
-    row?.setIsHover(false);
+    if (~store.hoverIndex) {
+      store.rows[store.hoverIndex].setIsHover(false);
+    }
   }
 
   draggingTr: HTMLTableRowElement;
@@ -1438,111 +1297,6 @@ export default class Table extends React.Component<TableProps, object> {
     document.removeEventListener('mouseup', this.handleColResizeMouseUp);
   }
 
-  handleColumnToggle(columns: Array<IColumn>) {
-    const {store} = this.props;
-
-    store.updateColumns(columns);
-  }
-
-  renderAutoFilterForm(): React.ReactNode {
-    const {
-      render,
-      store,
-      onSearchableFromReset,
-      onSearchableFromSubmit,
-      onSearchableFromInit,
-      classnames: cx,
-      translate: __
-    } = this.props;
-    const searchableColumns = store.searchableColumns;
-    const activedSearchableColumns = store.activedSearchableColumns;
-
-    if (!searchableColumns.length) {
-      return null;
-    }
-
-    const groupedSearchableColumns: Array<Record<string, any>> = [
-      {body: [], md: 4},
-      {body: [], md: 4},
-      {body: [], md: 4}
-    ];
-
-    activedSearchableColumns.forEach((column, index) => {
-      groupedSearchableColumns[index % 3].body.push({
-        ...column.searchable,
-        name: column.searchable?.name ?? column.name,
-        label: column.searchable?.label ?? column.label,
-        mode: 'horizontal'
-      });
-    });
-
-    return render(
-      'searchable-form',
-      {
-        type: 'form',
-        api: null,
-        title: '',
-        mode: 'normal',
-        submitText: __('search'),
-        body: [
-          {
-            type: 'grid',
-            columns: groupedSearchableColumns
-          }
-        ],
-        actions: [
-          {
-            type: 'dropdown-button',
-            label: __('Table.searchFields'),
-            className: cx('Table-searchableForm-dropdown', 'mr-2'),
-            level: 'link',
-            trigger: 'click',
-            size: 'sm',
-            align: 'right',
-            buttons: searchableColumns.map(column => {
-              return {
-                type: 'checkbox',
-                className: cx('Table-searchableForm-checkbox'),
-                name: `__search_${column.searchable?.name ?? column.name}`,
-                option: column.searchable?.label ?? column.label,
-                value: column.enableSearch,
-                badge: {
-                  offset: [-10, 5],
-                  visibleOn: `${
-                    column.toggable && !column.toggled && column.enableSearch
-                  }`
-                },
-                onChange: (value: boolean) => {
-                  column.setEnableSearch(value);
-                }
-              };
-            })
-          },
-          {
-            type: 'submit',
-            label: __('search'),
-            level: 'primary',
-            className: 'w-18'
-          },
-          {
-            type: 'reset',
-            label: __('reset'),
-            className: 'w-18'
-          }
-        ]
-      },
-      {
-        key: 'searchable-form',
-        panelClassName: cx('Table-searchableForm'),
-        actionsClassName: cx('Table-searchableForm-footer'),
-        onReset: onSearchableFromReset,
-        onSubmit: onSearchableFromSubmit,
-        onInit: onSearchableFromInit,
-        formStore: undefined
-      }
-    );
-  }
-
   renderHeading() {
     let {
       title,
@@ -1552,16 +1306,12 @@ export default class Table extends React.Component<TableProps, object> {
       classnames: cx,
       saveImmediately,
       headingClassName,
-      quickSaveApi,
       translate: __
     } = this.props;
 
     if (
       title ||
-      (quickSaveApi &&
-        !saveImmediately &&
-        store.modified &&
-        !hideQuickSaveBtn) ||
+      (!saveImmediately && store.modified && !hideQuickSaveBtn) ||
       store.moved
     ) {
       return (
@@ -1632,8 +1382,7 @@ export default class Table extends React.Component<TableProps, object> {
       render,
       classPrefix: ns,
       resizable,
-      classnames: cx,
-      autoGenerateFilter
+      classnames: cx
     } = this.props;
 
     if (column.type === '__checkme') {
@@ -1680,7 +1429,7 @@ export default class Table extends React.Component<TableProps, object> {
 
     let affix = null;
 
-    if (column.searchable && column.name && !autoGenerateFilter) {
+    if (column.searchable && column.name) {
       affix = (
         <HeadCellSearchDropDown
           {...this.props}
@@ -1768,11 +1517,6 @@ export default class Table extends React.Component<TableProps, object> {
       props.style.width = column.pristine.width;
     }
 
-    if (column.pristine.align) {
-      props.style = props.style || {};
-      props.style.textAlign = column.pristine.align;
-    }
-
     const resizeLine = (
       <div
         className={cx('Table-content-colDragLine')}
@@ -1784,20 +1528,18 @@ export default class Table extends React.Component<TableProps, object> {
     return (
       <th
         {...props}
-        className={cx(props ? (props as any).className : '', {
-          'TableCell--sortable': column.sortable,
-          'TableCell--searchable': column.searchable,
-          'TableCell--filterable': column.filterable,
-          'Table-operationCell': column.type === 'operation'
-        })}
+        className={cx(
+          props ? (props as any).className : '',
+          column.pristine.className,
+          {
+            'TableCell--sortable': column.sortable,
+            'TableCell--searchable': column.searchable,
+            'TableCell--filterable': column.filterable,
+            'Table-operationCell': column.type === 'operation'
+          }
+        )}
       >
-        <div
-          className={cx(
-            `${ns}TableCell--title`,
-            column.pristine.className,
-            column.pristine.labelClassName
-          )}
-        >
+        <div className={cx(`${ns}TableCell--title`)}>
           {column.label ? render('tpl', column.label) : null}
 
           {column.remark
@@ -1833,8 +1575,7 @@ export default class Table extends React.Component<TableProps, object> {
       classnames: cx,
       checkOnItemClick,
       popOverContainer,
-      canAccessSuperData,
-      itemBadge
+      canAccessSuperData
     } = this.props;
 
     if (column.name && item.rowSpans[column.name] === 0) {
@@ -1922,13 +1663,7 @@ export default class Table extends React.Component<TableProps, object> {
       quickEditFormRef: this.subFormRef,
       prefix,
       onImageEnlarge: this.handleImageEnlarge,
-      canAccessSuperData,
-      row: item,
-      itemBadge,
-      showBadge:
-        !props.isHead &&
-        itemBadge &&
-        store.firstToggledColumnIndex === props.colIndex
+      canAccessSuperData
     };
     delete subProps.label;
 
@@ -2033,8 +1768,7 @@ export default class Table extends React.Component<TableProps, object> {
       checkOnItemClick,
       buildItemProps,
       rowClassNameExpr,
-      rowClassName,
-      itemAction
+      rowClassName
     } = this.props;
     const hideHeader = store.filteredColumns.every(column => !column.label);
     const columnsGroup = store.columnGroup;
@@ -2095,7 +1829,6 @@ export default class Table extends React.Component<TableProps, object> {
               store.combineNum > 0 ? 'Table-table--withCombine' : '',
               tableClassName
             )}
-            itemAction={itemAction}
             classnames={cx}
             render={render}
             renderCell={this.renderCell}
@@ -2155,6 +1888,7 @@ export default class Table extends React.Component<TableProps, object> {
     } = this.props;
     const __ = rest.translate;
     const env = rest.env;
+
     const render = this.props.render;
 
     if (!store.columnsTogglable) {
@@ -2162,29 +1896,23 @@ export default class Table extends React.Component<TableProps, object> {
     }
 
     return (
-      <ColumnToggler
+      <DropDownButton
         {...rest}
-        {...(isObject(config) ? config : {})}
-        tooltip={config?.tooltip || __('Table.columnsVisibility')}
+        tooltip={__('Table.columnsVisibility')}
         tooltipContainer={
           env && env.getModalContainer ? env.getModalContainer : undefined
         }
-        align={config?.align ?? 'left'}
+        align={config ? config.align : 'left'}
         isActived={store.hasColumnHidden()}
         classnames={cx}
         classPrefix={ns}
         key="columns-toggable"
-        size={config?.size || 'sm'}
-        label={
-          config?.label || <Icon icon="columns" className="icon m-r-none" />
-        }
-        draggable={config?.draggable}
-        columns={store.columnsData}
-        onColumnToggle={this.handleColumnToggle}
+        size="sm"
+        label={<Icon icon="columns" className="icon m-r-none" />}
       >
         {store.toggableColumns.map(column => (
           <li
-            className={cx('ColumnToggler-menuItem')}
+            className={cx('DropDown-menuItem')}
             key={column.index}
             onClick={column.toggleToggle}
           >
@@ -2193,7 +1921,7 @@ export default class Table extends React.Component<TableProps, object> {
             </Checkbox>
           </li>
         ))}
-      </ColumnToggler>
+      </DropDownButton>
     );
   }
 
@@ -2227,7 +1955,7 @@ export default class Table extends React.Component<TableProps, object> {
     );
   }
 
-  renderExportExcel(toolbar: ExportExcelToolbar) {
+  renderExportExcel(toolbar: SchemaNode) {
     const {
       store,
       env,
@@ -2251,8 +1979,8 @@ export default class Table extends React.Component<TableProps, object> {
             let tmpStore;
             let filename = 'data';
             // 支持配置 api 远程获取
-            if (typeof toolbar === 'object' && toolbar.api) {
-              const res = await env.fetcher(toolbar.api, data);
+            if (typeof toolbar === 'object' && (toolbar as Schema).api) {
+              const res = await env.fetcher((toolbar as Schema).api, data);
               if (!res.data) {
                 env.notify('warning', __('placeholder.noData'));
                 return;
@@ -2270,8 +1998,8 @@ export default class Table extends React.Component<TableProps, object> {
               rows = store.rows;
             }
 
-            if (typeof toolbar === 'object' && toolbar.filename) {
-              filename = filter(toolbar.filename, data, '| raw');
+            if (typeof toolbar === 'object' && (toolbar as Schema).filename) {
+              filename = filter((toolbar as Schema).filename, data, '| raw');
             }
 
             if (rows.length === 0) {
@@ -2285,17 +2013,7 @@ export default class Table extends React.Component<TableProps, object> {
             });
             worksheet.views = [{state: 'frozen', xSplit: 0, ySplit: 1}];
 
-            const filteredColumns = toolbar.columns
-              ? columns.filter(column => {
-                  const filterColumnsNames = toolbar.columns!;
-                  if (filterColumnsNames.indexOf(column.name) !== -1) {
-                    return true;
-                  }
-                  return false;
-                })
-              : columns;
-
-            const firstRowLabels = filteredColumns.map(column => {
+            const firstRowLabels = columns.map(column => {
               return column.label;
             });
             const firstRow = worksheet.getRow(1);
@@ -2310,15 +2028,14 @@ export default class Table extends React.Component<TableProps, object> {
                 column: firstRowLabels.length
               }
             };
-            // 用于 mapping source 的情况
-            const remoteMappingCache: any = {};
             // 数据从第二行开始
             let rowIndex = 1;
             for (const row of rows) {
               rowIndex += 1;
               const sheetRow = worksheet.getRow(rowIndex);
               let columIndex = 0;
-              for (const column of filteredColumns) {
+              const cols = columns as any[]; // 为啥 ts 4.4 得这么做？
+              for (const column of cols) {
                 columIndex += 1;
                 const name = column.name!;
                 const value = getVariable(row.data, name);
@@ -2344,7 +2061,7 @@ export default class Table extends React.Component<TableProps, object> {
                 }
 
                 const type = (column as BaseSchema).type || 'plain';
-                if (type === 'image' && value) {
+                if (type === 'image') {
                   try {
                     const imageData = await toDataURL(value);
                     const imageDimensions = await getImageDimensions(imageData);
@@ -2404,30 +2121,7 @@ export default class Table extends React.Component<TableProps, object> {
                   };
                 } else if (type === 'mapping') {
                   // 拷贝自 Mapping.tsx
-                  let map = (column as MappingSchema).map;
-                  const source = (column as MappingSchema).source;
-                  if (source) {
-                    let sourceValue = source;
-                    if (isPureVariable(source)) {
-                      sourceValue = resolveVariableAndFilter(
-                        source as string,
-                        data,
-                        '| raw'
-                      );
-                    }
-
-                    const mapKey = JSON.stringify(source);
-                    if (mapKey in remoteMappingCache) {
-                      map = remoteMappingCache[mapKey];
-                    } else {
-                      const res = await env.fetcher(sourceValue, data);
-                      if (res.data) {
-                        remoteMappingCache[mapKey] = res.data;
-                        map = res.data;
-                      }
-                    }
-                  }
-
+                  const map = (column as MappingSchema).map;
                   if (
                     typeof value !== 'undefined' &&
                     map &&
@@ -2440,18 +2134,14 @@ export default class Table extends React.Component<TableProps, object> {
                         : value === false && map['0']
                         ? map['0']
                         : map['*']); // 兼容平台旧用法：即 value 为 true 时映射 1 ，为 false 时映射 0
-                    sheetRow.getCell(columIndex).value =
-                      removeHTMLTag(viewValue);
+                    sheetRow.getCell(columIndex).value = viewValue;
                   } else {
-                    sheetRow.getCell(columIndex).value = removeHTMLTag(value);
+                    sheetRow.getCell(columIndex).value = value;
                   }
                 } else {
                   if ((column as TplSchema).tpl) {
                     sheetRow.getCell(columIndex).value = removeHTMLTag(
-                      filter(
-                        (column as TplSchema).tpl,
-                        createObject(data, row.data)
-                      )
+                      filter((column as TplSchema).tpl, row.data)
                     );
                   } else {
                     sheetRow.getCell(columIndex).value = value;
@@ -2654,6 +2344,57 @@ export default class Table extends React.Component<TableProps, object> {
       : footerNode || toolbarNode || null;
   }
 
+  renderItemActions() {
+    const {itemActions, render, store, classnames: cx} = this.props;
+    const finalActions = Array.isArray(itemActions)
+      ? itemActions.filter(action => !action.hiddenOnHover)
+      : [];
+
+    if (!finalActions.length) {
+      return null;
+    }
+    const rowIndex = store.hoverIndex;
+    const heights = this.heights;
+    let height = 40;
+    let top = 0;
+
+    if (heights && heights[rowIndex]) {
+      height = heights[rowIndex];
+      top += heights.header;
+      for (let i = rowIndex - 1; i >= 0; i--) {
+        top += heights[i];
+      }
+    }
+
+    return (
+      <div
+        className={cx('Table-itemActions-wrap')}
+        style={{
+          top,
+          height
+        }}
+      >
+        <div className={cx('Table-itemActions')}>
+          {finalActions.map((action, index) =>
+            render(
+              `itemAction/${index}`,
+              {
+                ...(action as any),
+                isMenuItem: true
+              },
+              {
+                key: index,
+                item: store.rows[rowIndex],
+                data: store.rows[rowIndex].locals,
+                rowIndex
+              }
+            )
+          )}
+        </div>
+      </div>
+    );
+  }
+
   renderTableContent() {
     const {
       classnames: cx,
@@ -2668,11 +2409,7 @@ export default class Table extends React.Component<TableProps, object> {
       prefixRow,
       locale,
       affixRow,
-      tableContentClassName,
-      translate,
-      itemAction,
-      autoFillHeight,
-      itemActions
+      translate
     } = this.props;
 
     // 理论上来说 store.rows 应该也行啊
@@ -2683,13 +2420,8 @@ export default class Table extends React.Component<TableProps, object> {
       <TableContent
         tableClassName={cx(
           store.combineNum > 0 ? 'Table-table--withCombine' : '',
-          {'Table-table--checkOnItemClick': checkOnItemClick},
           tableClassName
         )}
-        className={tableContentClassName}
-        itemActions={itemActions}
-        itemAction={itemAction}
-        store={store}
         classnames={cx}
         columns={store.filteredColumns}
         columnsGroup={store.columnGroup}
@@ -2720,14 +2452,7 @@ export default class Table extends React.Component<TableProps, object> {
   }
 
   render() {
-    const {
-      className,
-      store,
-      classnames: cx,
-      affixColumns,
-      autoFillHeight,
-      autoGenerateFilter
-    } = this.props;
+    const {className, store, classnames: cx, affixColumns} = this.props;
 
     this.renderedToolbars = []; // 用来记录哪些 toolbar 已经渲染了，已经渲染了就不重复渲染了。
     const heading = this.renderHeading();
@@ -2742,11 +2467,9 @@ export default class Table extends React.Component<TableProps, object> {
     return (
       <div
         className={cx('Table', className, {
-          'Table--unsaved': !!store.modified || !!store.moved,
-          'Table--autoFillHeight': autoFillHeight
+          'Table--unsaved': !!store.modified || !!store.moved
         })}
       >
-        {autoGenerateFilter ? this.renderAutoFilterForm() : null}
         {header}
         {heading}
         <div
@@ -2780,6 +2503,7 @@ export default class Table extends React.Component<TableProps, object> {
               : null}
           </div>
           {this.renderTableContent()}
+          {~store.hoverIndex ? this.renderItemActions() : null}
         </div>
         {this.renderAffixHeader(tableClassName)}
         {footer}

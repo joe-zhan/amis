@@ -9,8 +9,7 @@ import {
   until,
   isVisible,
   getScrollParent,
-  autobind,
-  SkipOperation
+  autobind
 } from '../utils/helper';
 import {isApiOutdated, isEffectiveApi} from '../utils/api';
 import {IFormStore} from '../store/form';
@@ -547,16 +546,8 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
         .then(async () => {
           this.form && this.form.isValidated() && this.form.validate(true);
 
-          const feedback = action.feedback;
-          if (feedback && isVisible(feedback, store.data)) {
-            const confirmed = await this.openFeedback(feedback, store.data);
-
-            // 如果 feedback 配置了，取消就跳过原有逻辑。
-            if (feedback.skipRestOnCancel && !confirmed) {
-              throw new SkipOperation();
-            } else if (feedback.skipRestOnConfirm && confirmed) {
-              throw new SkipOperation();
-            }
+          if (action.feedback && isVisible(action.feedback, store.data)) {
+            await this.openFeedback(action.feedback, store.data);
           }
 
           const reidrect =
@@ -565,11 +556,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
 
           action.reload && this.reloadTarget(action.reload, store.data);
         })
-        .catch(reason => {
-          if (reason instanceof SkipOperation) {
-            return;
-          }
-        });
+        .catch(() => {});
     } else if (action.actionType === 'reload') {
       action.target && this.reloadTarget(action.target, data);
     } else if (onAction) {
@@ -680,29 +667,14 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
               }
             }
           })
-          .then(async (value: any) => {
-            const feedback = action.feedback;
-            if (feedback && isVisible(feedback, value)) {
-              const confirmed = await this.openFeedback(feedback, value);
-
-              // 如果 feedback 配置了，取消就跳过原有逻辑。
-              if (feedback.skipRestOnCancel && !confirmed) {
-                throw new SkipOperation();
-              } else if (feedback.skipRestOnConfirm && confirmed) {
-                throw new SkipOperation();
-              }
-            }
-
+          .then((value: any) =>
             this.gotoStep(
               value && typeof value.step === 'number'
                 ? value.step
                 : this.state.currentStep + 1
-            );
-          })
-          .catch(reason => {
-            if (reason instanceof SkipOperation) {
-              return;
-            }
+            )
+          )
+          .catch(() => {
             // do nothing
           });
       } else {
@@ -743,19 +715,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
               );
             }
           })
-          .then(async value => {
-            const feedback = action.feedback;
-            if (feedback && isVisible(feedback, value)) {
-              const confirmed = await this.openFeedback(feedback, value);
-
-              // 如果 feedback 配置了，取消就跳过原有逻辑。
-              if (feedback.skipRestOnCancel && !confirmed) {
-                throw new SkipOperation();
-              } else if (feedback.skipRestOnConfirm && confirmed) {
-                throw new SkipOperation();
-              }
-            }
-
+          .then(value => {
             this.setState({completeStep: steps.length});
             store.updateData({
               ...store.data,
@@ -811,13 +771,13 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
       store.updateData(values[0]);
     }
 
-    store.closeDialog(true);
+    store.closeDialog();
   }
 
   @autobind
-  handleDialogClose(confirmed = false) {
+  handleDialogClose() {
     const {store} = this.props;
-    store.closeDialog(confirmed);
+    store.closeDialog();
   }
 
   renderSteps() {
@@ -846,15 +806,10 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
                     className={cx('Badge', {
                       // 'Badge--success': canJump && currentStep != key + 1,
                       'is-complete': isComplete,
-                      'is-active':
-                        isActive || (canJump && currentStep != key + 1)
+                      'is-active': isActive || (canJump && currentStep != key + 1)
                     })}
                   >
-                    {isComplete && !isActive ? (
-                      <Icon icon="check" className="icon" />
-                    ) : (
-                      key + 1
-                    )}
+                    {isComplete && !isActive ? (<Icon icon="check" className="icon" />) : key + 1}
                   </span>
                   {step.title || step.label || `第 ${key + 1} 步`}
                 </li>
@@ -1041,8 +996,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
                   disabled: store.loading,
                   popOverContainer:
                     popOverContainer || this.getPopOverContainer,
-                  onChange: this.handleChange,
-                  formStore: undefined
+                  onChange: this.handleChange
                 }
               )
             ) : currentStep === -1 ? (

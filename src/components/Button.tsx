@@ -7,7 +7,7 @@ import React from 'react';
 import TooltipWrapper, {TooltipObject, Trigger} from './TooltipWrapper';
 import {pickEventsProps} from '../utils/helper';
 import {ClassNamesFn, themeable} from '../theme';
-import {Icon} from './icons';
+
 interface ButtonProps extends React.DOMAttributes<HTMLButtonElement> {
   id?: string;
   className?: string;
@@ -16,7 +16,7 @@ interface ButtonProps extends React.DOMAttributes<HTMLButtonElement> {
   type: 'button' | 'reset' | 'submit';
   level: string; // 'link' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'danger' | 'light' | 'dark' | 'default';
   tooltip?: string | TooltipObject;
-  tooltipPlacement: 'top' | 'right' | 'bottom' | 'left';
+  placement: 'top' | 'right' | 'bottom' | 'left';
   tooltipContainer?: any;
   tooltipTrigger: Trigger | Array<Trigger>;
   tooltipRootClose: boolean;
@@ -29,8 +29,6 @@ interface ButtonProps extends React.DOMAttributes<HTMLButtonElement> {
   classnames: ClassNamesFn;
   componentClass: React.ReactType;
   overrideClassName?: boolean;
-  loading?: boolean;
-  loadingClassName?: string;
 }
 
 export class Button extends React.Component<ButtonProps> {
@@ -39,14 +37,14 @@ export class Button extends React.Component<ButtonProps> {
     | 'componentClass'
     | 'level'
     | 'type'
-    | 'tooltipPlacement'
+    | 'placement'
     | 'tooltipTrigger'
     | 'tooltipRootClose'
   > = {
     componentClass: 'button',
     level: 'default',
     type: 'button',
-    tooltipPlacement: 'top',
+    placement: 'top',
     tooltipTrigger: ['hover', 'focus'],
     tooltipRootClose: false
   };
@@ -66,15 +64,13 @@ export class Button extends React.Component<ButtonProps> {
       active,
       iconOnly,
       href,
-      loading,
-      loadingClassName,
       overrideClassName,
       ...rest
     } = this.props;
 
     if (href) {
       Comp = 'a';
-    } else if ((Comp === 'button' && disabled) || loading) {
+    } else if (Comp === 'button' && disabled) {
       Comp = 'div';
     }
 
@@ -82,7 +78,6 @@ export class Button extends React.Component<ButtonProps> {
       <Comp
         type={Comp === 'input' || Comp === 'button' ? type : undefined}
         {...pickEventsProps(rest)}
-        onClick={rest.onClick && disabled ? () => {} : rest.onClick}
         href={href}
         className={cx(
           overrideClassName
@@ -100,18 +95,6 @@ export class Button extends React.Component<ButtonProps> {
         )}
         disabled={disabled}
       >
-        {loading && !disabled ? (
-          <span
-            className={cx(
-              overrideClassName
-                ? ''
-                : {[`Button--loading Button--loading--${level}`]: level},
-              loadingClassName
-            )}
-          >
-            <Icon icon="loading-outline" className="icon" />
-          </span>
-        ) : null}
         {children}
       </Comp>
     );
@@ -120,7 +103,7 @@ export class Button extends React.Component<ButtonProps> {
   render() {
     const {
       tooltip,
-      tooltipPlacement,
+      placement,
       tooltipContainer,
       tooltipTrigger,
       tooltipRootClose,
@@ -131,7 +114,7 @@ export class Button extends React.Component<ButtonProps> {
 
     return (
       <TooltipWrapper
-        placement={tooltipPlacement}
+        placement={placement}
         tooltip={disabled ? disabledTip : tooltip}
         container={tooltipContainer}
         trigger={tooltipTrigger}

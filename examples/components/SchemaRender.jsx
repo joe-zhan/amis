@@ -1,13 +1,12 @@
 import React from 'react';
 import {render} from '../../src/index';
 import axios from 'axios';
-import Portal from 'react-overlays/Portal';
 import {toast} from '../../src/components/Toast';
 import {normalizeLink} from '../../src/utils/normalizeLink';
 import Button from '../../src/components/Button';
 import LazyComponent from '../../src/components/LazyComponent';
 import {default as DrawerContainer} from '../../src/components/Drawer';
-
+import {Portal} from 'react-overlays';
 import {withRouter} from 'react-router';
 import copy from 'copy-to-clipboard';
 
@@ -18,7 +17,7 @@ function loadEditor() {
   );
 }
 
-const viewMode = localStorage.getItem('amis-viewMode') || 'pc';
+const viewMode = localStorage.getItem('viewMode') || 'pc';
 
 export default function (schema, showCode, envOverrides) {
   if (!schema['$schema']) {
@@ -32,7 +31,6 @@ export default function (schema, showCode, envOverrides) {
       static displayName = 'SchemaRenderer';
       iframeRef;
       state = {open: false, schema: {}};
-      originalTitle = document.title;
       toggleCode = () =>
         this.setState({
           open: !this.state.open
@@ -117,17 +115,14 @@ export default function (schema, showCode, envOverrides) {
             return axios[method](url, data, config);
           },
           isCancel: value => axios.isCancel(value),
-          copy: (content, options) => {
-            copy(content, options);
+          copy: content => {
+            copy(content);
             toast.success('内容已复制到粘贴板');
           },
           blockRouting: fn => {
             return router.setRouteLeaveHook(route, nextLocation => {
               return fn(nextLocation);
             });
-          },
-          tracker(eventTrack) {
-            console.debug('eventTrack', eventTrack);
           },
           ...envOverrides
         };
@@ -201,13 +196,6 @@ export default function (schema, showCode, envOverrides) {
       componentWillUnmount() {
         this.props.setAsideFolded && this.props.setAsideFolded(false);
         window.removeEventListener('message', this.watchIframeReady, false);
-        document.title = this.originalTitle;
-      }
-
-      componentDidMount() {
-        if (schema.title) {
-          document.title = schema.title;
-        }
       }
 
       renderSchema() {

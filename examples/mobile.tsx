@@ -39,7 +39,7 @@ class AMISComponent extends React.Component {
             responseType,
             config, // 其他配置
             headers // 请求头
-          }) => {
+          }: any) => {
             config = {
               dataType: 'json',
               ...config
@@ -52,7 +52,7 @@ class AMISComponent extends React.Component {
             }
 
             // 支持返回各种报错信息
-            config.validateStatus = function () {
+            config.validateStatus = function (status) {
               return true;
             };
 
@@ -77,20 +77,18 @@ class AMISComponent extends React.Component {
             }
             return response;
           },
-          isCancel: value => axios.isCancel(value),
-          copy: (content, optinos) => {
-            copy(content, optinos);
+          isCancel: (value: any) => (axios as any).isCancel(value),
+          copy: content => {
+            copy(content);
             toast.success('内容已复制到粘贴板');
           },
-          tracker(eventTrack) {
-            console.debug('eventTrack', eventTrack);
-          }
+          affixOffsetTop: 0
         })}
       </div>
     ) : null;
   }
 }
 
-export function bootstrap(mountTo) {
+export function bootstrap(mountTo, initalState) {
   render(<AMISComponent />, mountTo);
 }

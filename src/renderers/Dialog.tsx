@@ -97,7 +97,7 @@ export type DialogSchemaBase = Omit<DialogSchema, 'type'>;
 export interface DialogProps
   extends RendererProps,
     Omit<DialogSchema, 'className'> {
-  onClose: (confirmed?: boolean) => void;
+  onClose: () => void;
   onConfirm: (
     values: Array<object>,
     action: Action,
@@ -214,12 +214,12 @@ export default class Dialog extends React.Component<DialogProps> {
     return ret;
   }
 
-  handleSelfClose(e?: any, confirmed?: boolean) {
+  handleSelfClose() {
     const {onClose, store} = this.props;
 
     // clear error
     store.updateMessage();
-    onClose(confirmed);
+    onClose();
   }
 
   handleAction(e: React.UIEvent<any>, action: Action, data: object) {
@@ -251,7 +251,7 @@ export default class Dialog extends React.Component<DialogProps> {
       return;
     }
 
-    store.closeDialog(true);
+    store.closeDialog();
   }
 
   handleDialogClose(...args: Array<any>) {
@@ -264,7 +264,7 @@ export default class Dialog extends React.Component<DialogProps> {
       return;
     }
 
-    store.closeDialog(args[1]);
+    store.closeDialog();
   }
 
   handleDrawerConfirm(values: object[], action: Action, ...args: Array<any>) {
@@ -318,7 +318,7 @@ export default class Dialog extends React.Component<DialogProps> {
   handleExited() {
     const {lazySchema, store} = this.props;
     if (isAlive(store)) {
-      store.reset();
+      store.setFormData({});
       store.setEntered(false);
       if (typeof lazySchema === 'function') {
         store.setSchema('');
@@ -395,8 +395,7 @@ export default class Dialog extends React.Component<DialogProps> {
       affixOffsetTop: 0,
       onChange: this.handleFormChange,
       onInit: this.handleFormInit,
-      onSaved: this.handleFormSaved,
-      syncLocation: false // 弹框中的 crud 一般不需要同步地址栏
+      onSaved: this.handleFormSaved
     };
 
     if (!(body as Schema).type) {
@@ -629,6 +628,10 @@ export class DialogRenderer extends Dialog {
   tryChildrenToHandle(action: Action, ctx: object, rawAction?: Action) {
     const scoped = this.context as IScopedContext;
 
+    if (action.fromDialog) {
+      return false;
+    }
+
     const targets: Array<any> = [];
     const {onConfirm, store} = this.props;
 
@@ -743,7 +746,7 @@ export class DialogRenderer extends Dialog {
         },
         data,
         action
-      ) || this.handleSelfClose(undefined, true);
+      ) || this.handleSelfClose();
     } else if (action.actionType === 'next' || action.actionType === 'prev') {
       store.setCurrentAction(action);
       if (action.type === 'submit') {
@@ -755,7 +758,7 @@ export class DialogRenderer extends Dialog {
           },
           data,
           action
-        ) || this.handleSelfClose(undefined, true);
+        ) || this.handleSelfClose();
       } else {
         onConfirm([data], action, data, []);
       }
@@ -769,7 +772,7 @@ export class DialogRenderer extends Dialog {
       store.setCurrentAction(action);
       action.target && scoped.reload(action.target, data);
       if (action.close || action.type === 'submit') {
-        this.handleSelfClose(undefined, action.type === 'submit');
+        this.handleSelfClose();
         this.closeTarget(action.close);
       }
     } else if (this.tryChildrenToHandle(action, data)) {

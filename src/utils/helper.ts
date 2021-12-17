@@ -10,43 +10,55 @@ import {IIRendererStore} from '../store';
 import {IFormStore} from '../store/form';
 import {autobindMethod} from './autobind';
 import {
-  createObject,
-  cloneObject,
-  isObject,
-  string2regExp,
-  getVariable,
-  setVariable,
-  deleteVariable,
-  keyToPath,
   isPureVariable,
   resolveVariable,
   resolveVariableAndFilter
-} from 'amis-formula';
+} from './tpl-builtin';
 import {isObservable} from 'mobx';
 
-export {
-  createObject,
-  cloneObject,
-  isObject,
-  string2regExp,
-  getVariable,
-  setVariable,
-  deleteVariable,
-  keyToPath
-};
-
-export function preventDefault(event: TouchEvent | Event): void {
-  if (typeof event.cancelable !== 'boolean' || event.cancelable) {
-    event.preventDefault();
+// 方便取值的时候能够把上层的取到，但是获取的时候不会全部把所有的数据获取到。
+export function createObject(
+  superProps?: {[propName: string]: any},
+  props?: {[propName: string]: any},
+  properties?: any
+): object {
+  if (superProps && Object.isFrozen(superProps)) {
+    superProps = cloneObject(superProps);
   }
+
+  const obj = superProps
+    ? Object.create(superProps, {
+        ...properties,
+        __super: {
+          value: superProps,
+          writable: false,
+          enumerable: false
+        }
+      })
+    : Object.create(Object.prototype, properties);
+
+  props &&
+    isObject(props) &&
+    Object.keys(props).forEach(key => (obj[key] = props[key]));
+
+  return obj;
 }
 
-export function isMobile() {
-  return (window as any).matchMedia?.('(max-width: 768px)').matches;
-}
-
-export function range(num: number, min: number, max: number): number {
-  return Math.min(Math.max(num, min), max);
+export function cloneObject(target: any, persistOwnProps: boolean = true) {
+  const obj =
+    target && target.__super
+      ? Object.create(target.__super, {
+          __super: {
+            value: target.__super,
+            writable: false,
+            enumerable: false
+          }
+        })
+      : Object.create(Object.prototype);
+  persistOwnProps &&
+    target &&
+    Object.keys(target).forEach(key => (obj[key] = target[key]));
+  return obj;
 }
 
 /**
@@ -70,30 +82,6 @@ export function extendObject(
   const obj = cloneObject(target, persistOwnProps);
   src && Object.keys(src).forEach(key => (obj[key] = src[key]));
   return obj;
-}
-
-export function isSuperDataModified(
-  data: any,
-  prevData: any,
-  store: IIRendererStore
-) {
-  let keys: Array<string> = [];
-
-  if (store && store.storeType === 'FormStore') {
-    keys = uniq(
-      (store as IFormStore).items
-        .map(item => `${item.name}`.replace(/\..*$/, ''))
-        .concat(Object.keys(store.data))
-    );
-  } else {
-    keys = Object.keys(store.data);
-  }
-
-  if (Array.isArray(keys) && keys.length) {
-    return keys.some(key => data[key] !== prevData[key]);
-  }
-
-  return false;
 }
 
 export function syncDataFromSuper(
@@ -166,6 +154,95 @@ export function findIndex(
   }
 
   return -1;
+}
+
+export function getVariable(
+  data: {[propName: string]: any},
+  key: string | undefined,
+  canAccessSuper: boolean = true
+): any {
+  if (!data || !key) {
+    return undefined;
+  } else if (canAccessSuper ? key in data : data.hasOwnProperty(key)) {
+    return data[key];
+  }
+
+  return keyToPath(key).reduce(
+    (obj, key) =>
+      obj &&
+      typeof obj === 'object' &&
+      (canAccessSuper ? key in obj : obj.hasOwnProperty(key))
+        ? obj[key]
+        : undefined,
+    data
+  );
+}
+
+export function setVariable(
+  data: {[propName: string]: any},
+  key: string,
+  value: any
+) {
+  data = data || {};
+
+  if (key in data) {
+    data[key] = value;
+    return;
+  }
+
+  const parts = keyToPath(key);
+  const last = parts.pop() as string;
+
+  while (parts.length) {
+    let key = parts.shift() as string;
+    if (isPlainObject(data[key])) {
+      data = data[key] = {
+        ...data[key]
+      };
+    } else if (Array.isArray(data[key])) {
+      data[key] = data[key].concat();
+      data = data[key];
+    } else if (data[key]) {
+      // throw new Error(`目标路径不是纯对象，不能覆盖`);
+      // 强行转成对象
+      data[key] = {};
+      data = data[key];
+    } else {
+      data[key] = {};
+      data = data[key];
+    }
+  }
+
+  data[last] = value;
+}
+
+export function deleteVariable(data: {[propName: string]: any}, key: string) {
+  if (!data) {
+    return;
+  } else if (data.hasOwnProperty(key)) {
+    delete data[key];
+    return;
+  }
+
+  const parts = keyToPath(key);
+  const last = parts.pop() as string;
+
+  while (parts.length) {
+    let key = parts.shift() as string;
+    if (isPlainObject(data[key])) {
+      data = data[key] = {
+        ...data[key]
+      };
+    } else if (data[key]) {
+      throw new Error(`目标路径不是纯对象，不能修改`);
+    } else {
+      break;
+    }
+  }
+
+  if (data && data.hasOwnProperty && data.hasOwnProperty(last)) {
+    delete data[last];
+  }
 }
 
 export function hasOwnProperty(
@@ -598,6 +675,18 @@ export function __uri(id: string) {
   return id;
 }
 
+export function isObject(obj: any) {
+  const typename = typeof obj;
+  return (
+    obj &&
+    typename !== 'string' &&
+    typename !== 'number' &&
+    typename !== 'boolean' &&
+    typename !== 'function' &&
+    !Array.isArray(obj)
+  );
+}
+
 // xs < 768px
 // sm >= 768px
 // md >= 992px
@@ -891,7 +980,11 @@ export function filterTree<T extends TreeItem>(
           ? filterTree(item.children, iterator, level + 1, depthFirst)
           : undefined;
 
-        if (Array.isArray(children) && Array.isArray(item.children)) {
+        if (
+          Array.isArray(children) &&
+          Array.isArray(item.children) &&
+          children.length !== item.children.length
+        ) {
           item = {...item, children: children};
         }
 
@@ -911,7 +1004,11 @@ export function filterTree<T extends TreeItem>(
           depthFirst
         );
 
-        if (Array.isArray(children) && Array.isArray(item.children)) {
+        if (
+          Array.isArray(children) &&
+          Array.isArray(item.children) &&
+          children.length !== item.children.length
+        ) {
           item = {...item, children: children};
         }
       }
@@ -1142,6 +1239,17 @@ export function getLevelFromClassName(
   return defaultValue;
 }
 
+export function string2regExp(value: string, caseSensitive = false) {
+  if (typeof value !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+
+  return new RegExp(
+    value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d'),
+    !caseSensitive ? 'i' : ''
+  );
+}
+
 export function pickEventsProps(props: any) {
   const ret: any = {};
   props &&
@@ -1344,6 +1452,38 @@ export function loadScript(src: string) {
 export class SkipOperation extends Error {}
 
 /**
+ * 将例如像 a.b.c 或 a[1].b 的字符串转换为路径数组
+ *
+ * @param string 要转换的字符串
+ */
+export const keyToPath = (string: string) => {
+  const result = [];
+
+  if (string.charCodeAt(0) === '.'.charCodeAt(0)) {
+    result.push('');
+  }
+
+  string.replace(
+    new RegExp(
+      '[^.[\\]]+|\\[(?:([^"\'][^[]*)|(["\'])((?:(?!\\2)[^\\\\]|\\\\.)*?)\\2)\\]|(?=(?:\\.|\\[\\])(?:\\.|\\[\\]|$))',
+      'g'
+    ),
+    (match, expression, quote, subString) => {
+      let key = match;
+      if (quote) {
+        key = subString.replace(/\\(\\)?/g, '$1');
+      } else if (expression) {
+        key = expression.trim();
+      }
+      result.push(key);
+      return '';
+    }
+  );
+
+  return result;
+};
+
+/**
  * 检查对象是否有循环引用，来自 https://stackoverflow.com/a/34909127
  * @param obj
  */
@@ -1477,7 +1617,7 @@ export function detectPropValueChanged<
 
 // 去掉字符串中的 html 标签，不完全准确但效率比较高
 export function removeHTMLTag(str: string) {
-  return typeof str === 'string' ? str.replace(/<\/?[^>]+(>|$)/g, '') : str;
+  return str.replace(/<\/?[^>]+(>|$)/g, '');
 }
 
 /**
@@ -1541,79 +1681,4 @@ export function normalizeNodePath(
   }
 
   return {nodeValueArray, nodePathArray};
-}
-
-// 主要用于排除点击输入框和链接等情况
-export function isClickOnInput(e: React.MouseEvent<HTMLElement>) {
-  const target: HTMLElement = e.target as HTMLElement;
-  let formItem;
-  if (
-    !e.currentTarget.contains(target) ||
-    ~['INPUT', 'TEXTAREA'].indexOf(target.tagName) ||
-    ((formItem = target.closest(`button, a, [data-role="form-item"]`)) &&
-      e.currentTarget.contains(formItem))
-  ) {
-    return true;
-  }
-  return false;
-}
-
-// 计算字符串 hash
-export function hashCode(s: string): number {
-  return s.split('').reduce((a, b) => {
-    a = (a << 5) - a + b.charCodeAt(0);
-    return a & a;
-  }, 0);
-}
-
-/**
- * 遍历 schema
- * @param json
- * @param mapper
- */
-export function JSONTraverse(
-  json: any,
-  mapper: (value: any, key: string | number, host: Object) => any
-) {
-  Object.keys(json).forEach(key => {
-    const value: any = json[key];
-    if (isPlainObject(value) || Array.isArray(value)) {
-      JSONTraverse(value, mapper);
-    } else {
-      mapper(value, key, json);
-    }
-  });
-}
-
-export function convertDateArrayToDate(
-  value: number[],
-  types: string[],
-  date: moment.Moment
-): moment.Moment | null {
-  if (value.length === 0) return date;
-  for (let i = 0; i < types.length; i++) {
-    const type = types[i];
-    // @ts-ignore
-    date[type](value[i]);
-  }
-  return date;
-}
-
-export function convertDateToObject(value: moment.Moment) {
-  if (value) {
-    return {
-      year: value.year(),
-      month: parseInt(value.format('MM'), 10),
-      day: parseInt(value.format('DD'), 10)
-    };
-  }
-  return null;
-}
-
-export function getRange(min: number, max: number, step: number = 1) {
-  const arr = [];
-  for (let i = min; i <= max; i += step) {
-    arr.push(i);
-  }
-  return arr;
 }

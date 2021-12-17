@@ -1,31 +1,30 @@
 import React from 'react';
 import {ThemeProps, themeable} from '../theme';
-import {BaseSelectionProps, BaseSelection} from './Selection';
+import {BaseCheckboxesProps, BaseCheckboxes} from './Checkboxes';
 import {Options, Option} from './Select';
 import {uncontrollable} from 'uncontrollable';
 import ResultList from './ResultList';
-import TableSelection from './TableSelection';
-import TreeSelection from './TreeSelection';
+import TableCheckboxes from './TableCheckboxes';
+import ListCheckboxes from './ListCheckboxes';
+import TreeCheckboxes from './TreeCheckboxes';
 import {autobind, flattenTree} from '../utils/helper';
 import InputBox from './InputBox';
 import {Icon} from './icons';
 import debounce from 'lodash/debounce';
-import AssociatedSelection from './AssociatedSelection';
+import ChainedCheckboxes from './ChainedCheckboxes';
+import AssociatedCheckboxes from './AssociatedCheckboxes';
 import {LocaleProps, localeable} from '../locale';
-import GroupedSelection from './GroupedSelection';
-import ChainedSelection from './ChainedSelection';
 
 export interface TransferProps
   extends ThemeProps,
     LocaleProps,
-    BaseSelectionProps {
+    BaseCheckboxesProps {
   inline?: boolean;
   statistics?: boolean;
   showArrow?: boolean;
-  multiple?: boolean;
 
   selectTitle?: string;
-  selectMode?: 'table' | 'group' | 'list' | 'tree' | 'chained' | 'associated';
+  selectMode?: 'table' | 'list' | 'tree' | 'chained' | 'associated';
   columns?: Array<{
     name: string;
     label: string;
@@ -42,12 +41,12 @@ export interface TransferProps
     rowIndex: number
   ) => JSX.Element;
   leftOptions?: Array<Option>;
-  leftMode?: 'tree' | 'list' | 'group';
+  leftMode?: 'tree' | 'list';
   leftDefaultValue?: any;
-  rightMode?: 'table' | 'list' | 'group' | 'tree' | 'chained';
+  rightMode?: 'table' | 'list' | 'tree' | 'chained';
 
   // search 相关
-  searchResultMode?: 'table' | 'list' | 'group' | 'tree' | 'chained';
+  searchResultMode?: 'table' | 'list' | 'tree' | 'chained';
   searchResultColumns?: Array<{
     name: string;
     label: string;
@@ -80,11 +79,8 @@ export interface TransferState {
   searchResult: Options | null;
 }
 
-export class Transfer<
-  T extends TransferProps = TransferProps
-> extends React.Component<T, TransferState> {
-  static defaultProps: Pick<TransferProps, 'itemRender' | 'multiple'> = {
-    multiple: true,
+export class Transfer extends React.Component<TransferProps, TransferState> {
+  static defaultProps = {
     itemRender: (option: Option) => <span>{option.label}</span>
   };
 
@@ -106,7 +102,7 @@ export class Transfer<
   @autobind
   toggleAll() {
     const {options, option2value, onChange, value} = this.props;
-    let valueArray = BaseSelection.value2array(value, options, option2value);
+    let valueArray = BaseCheckboxes.value2array(value, options, option2value);
     const availableOptions = flattenTree(options).filter(
       (option, index, list) =>
         !option.disabled &&
@@ -196,11 +192,7 @@ export class Transfer<
     }
   );
 
-  renderSelect(
-    props: TransferProps & {
-      onToggleAll?: () => void;
-    }
-  ) {
+  renderSelect() {
     const {
       selectRender,
       selectMode,
@@ -211,11 +203,11 @@ export class Transfer<
       options,
       statistics,
       translate: __
-    } = props;
+    } = this.props;
 
     if (selectRender) {
       return selectRender({
-        ...props,
+        ...this.props,
         onSearch: this.handleSearch,
         onSearchCancel: this.handleSeachCancel,
         searchResult: this.state.searchResult
@@ -231,7 +223,7 @@ export class Transfer<
           )}
         >
           <span>
-            {__(selectTitle || 'Transfer.available')}
+            {__(selectTitle || 'Select.placeholder')}
             {statistics !== false ? (
               <span>
                 （{this.valueArray.length}/{this.availableOptions.length}）
@@ -240,13 +232,13 @@ export class Transfer<
           </span>
           {selectMode !== 'table' ? (
             <a
-              onClick={props.onToggleAll || this.toggleAll}
+              onClick={this.toggleAll}
               className={cx(
                 'Transfer-checkAll',
                 disabled || !options.length ? 'is-disabled' : ''
               )}
             >
-              {__('Select.checkAll')}
+              {__('Select.placeholder')}
             </a>
           ) : null}
         </div>
@@ -272,37 +264,34 @@ export class Transfer<
         ) : null}
 
         {this.state.searchResult !== null
-          ? this.renderSearchResult(props)
-          : this.renderOptions(props)}
+          ? this.renderSearchResult()
+          : this.renderOptions()}
       </>
     );
   }
 
-  renderSearchResult(props: TransferProps) {
+  renderSearchResult() {
     const {
       searchResultMode,
       selectMode,
       noResultsText,
       searchResultColumns,
-      columns,
       classnames: cx,
       value,
       disabled,
       onChange,
       option2value,
       optionItemRender,
-      cellRender,
-      multiple
-    } = props;
+      cellRender
+    } = this.props;
     const options = this.state.searchResult || [];
     const mode = searchResultMode || selectMode;
-    const resultColumns = searchResultColumns || columns;
 
     return mode === 'table' ? (
-      <TableSelection
+      <TableCheckboxes
         placeholder={noResultsText}
-        className={cx('Transfer-selection')}
-        columns={resultColumns!}
+        className={cx('Transfer-checkboxes')}
+        columns={searchResultColumns!}
         options={options}
         value={value}
         disabled={disabled}
@@ -310,48 +299,44 @@ export class Transfer<
         option2value={option2value}
         cellRender={cellRender}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : mode === 'tree' ? (
-      <TreeSelection
+      <TreeCheckboxes
         placeholder={noResultsText}
-        className={cx('Transfer-selection')}
+        className={cx('Transfer-checkboxes')}
         options={options}
         value={value}
         disabled={disabled}
         onChange={onChange}
         option2value={option2value}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : mode === 'chained' ? (
-      <ChainedSelection
+      <ChainedCheckboxes
         placeholder={noResultsText}
-        className={cx('Transfer-selection')}
+        className={cx('Transfer-checkboxes')}
         options={options}
         value={value}
         disabled={disabled}
         onChange={onChange}
         option2value={option2value}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : (
-      <GroupedSelection
+      <ListCheckboxes
         placeholder={noResultsText}
-        className={cx('Transfer-selection')}
+        className={cx('Transfer-checkboxes')}
         options={options}
         value={value}
         disabled={disabled}
         onChange={onChange}
         option2value={option2value}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     );
   }
 
-  renderOptions(props: TransferProps) {
+  renderOptions() {
     const {
       selectMode,
       columns,
@@ -367,13 +352,12 @@ export class Transfer<
       rightMode,
       cellRender,
       leftDefaultValue,
-      optionItemRender,
-      multiple
-    } = props;
+      optionItemRender
+    } = this.props;
 
     return selectMode === 'table' ? (
-      <TableSelection
-        className={cx('Transfer-selection')}
+      <TableCheckboxes
+        className={cx('Transfer-checkboxes')}
         columns={columns!}
         options={options || []}
         value={value}
@@ -383,11 +367,10 @@ export class Transfer<
         onDeferLoad={onDeferLoad}
         cellRender={cellRender}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : selectMode === 'tree' ? (
-      <TreeSelection
-        className={cx('Transfer-selection')}
+      <TreeCheckboxes
+        className={cx('Transfer-checkboxes')}
         options={options || []}
         value={value}
         disabled={disabled}
@@ -395,11 +378,10 @@ export class Transfer<
         option2value={option2value}
         onDeferLoad={onDeferLoad}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : selectMode === 'chained' ? (
-      <ChainedSelection
-        className={cx('Transfer-selection')}
+      <ChainedCheckboxes
+        className={cx('Transfer-checkboxes')}
         options={options || []}
         value={value}
         disabled={disabled}
@@ -407,11 +389,10 @@ export class Transfer<
         option2value={option2value}
         onDeferLoad={onDeferLoad}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : selectMode === 'associated' ? (
-      <AssociatedSelection
-        className={cx('Transfer-selection')}
+      <AssociatedCheckboxes
+        className={cx('Transfer-checkboxes')}
         options={options || []}
         value={value}
         disabled={disabled}
@@ -424,11 +405,10 @@ export class Transfer<
         rightMode={rightMode}
         leftDefaultValue={leftDefaultValue}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     ) : (
-      <GroupedSelection
-        className={cx('Transfer-selection')}
+      <ListCheckboxes
+        className={cx('Transfer-checkboxes')}
         options={options || []}
         value={value}
         disabled={disabled}
@@ -436,7 +416,6 @@ export class Transfer<
         option2value={option2value}
         onDeferLoad={onDeferLoad}
         itemRender={optionItemRender}
-        multiple={multiple}
       />
     );
   }
@@ -459,7 +438,7 @@ export class Transfer<
       translate: __
     } = this.props;
 
-    this.valueArray = BaseSelection.value2array(value, options, option2value);
+    this.valueArray = BaseCheckboxes.value2array(value, options, option2value);
     this.availableOptions = flattenTree(options).filter(
       (option, index, list) =>
         !option.disabled &&
@@ -471,9 +450,7 @@ export class Transfer<
       <div
         className={cx('Transfer', className, inline ? 'Transfer--inline' : '')}
       >
-        <div className={cx('Transfer-select')}>
-          {this.renderSelect(this.props)}
-        </div>
+        <div className={cx('Transfer-select')}>{this.renderSelect()}</div>
         <div className={cx('Transfer-mid')}>
           {showArrow /*todo 需要改成确认模式，即：点了按钮才到右边 */ ? (
             <div className={cx('Transfer-arrow')}>
@@ -502,7 +479,7 @@ export class Transfer<
             </a>
           </div>
           <ResultList
-            className={cx('Transfer-value')}
+            className={cx('Transfer-selections')}
             sortable={sortable}
             disabled={disabled}
             value={value}
@@ -518,7 +495,7 @@ export class Transfer<
 
 export default themeable(
   localeable(
-    uncontrollable(class extends Transfer {}, {
+    uncontrollable(Transfer, {
       value: 'onChange'
     })
   )

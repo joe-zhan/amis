@@ -29,9 +29,6 @@ export function getComputedStyle(element: HTMLElement, prop: string) {
 }
 
 function attachResizeEvent(element: HTMLElement, resized: () => void) {
-  if (!element) {
-    return;
-  }
   if (!(element as any).resizedAttached) {
     (element as any).resizedAttached = new EventQueue();
     (element as any).resizedAttached.add(resized);
@@ -168,10 +165,6 @@ export function resizeSensor(
   callback: () => void,
   once: boolean = false
 ) {
-  if (!element) {
-    return () => {};
-  }
-
   let disposeEvent: (() => void) | undefined = undefined;
 
   if (once) {

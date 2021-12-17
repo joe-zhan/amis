@@ -478,19 +478,6 @@ export default class TreeSelectControl extends React.Component<
       minLength,
       labelField,
       nodePath,
-      onAdd,
-      creatable,
-      createTip,
-      addControls,
-      onEdit,
-      editable,
-      editTip,
-      editControls,
-      removable,
-      removeTip,
-      onDelete,
-      rootCreatable,
-      rootCreateTip,
       translate: __,
       deferLoad,
       expandTreeOptions
@@ -546,18 +533,6 @@ export default class TreeSelectControl extends React.Component<
             pathSeparator={pathSeparator}
             maxLength={maxLength}
             minLength={minLength}
-            onAdd={onAdd}
-            creatable={creatable}
-            createTip={createTip}
-            rootCreatable={rootCreatable}
-            rootCreateTip={rootCreateTip}
-            onEdit={onEdit}
-            editable={editable}
-            editTip={editTip}
-            removable={removable}
-            removeTip={removeTip}
-            onDelete={onDelete}
-            bultinCUD={!addControls && !editControls}
             onDeferLoad={deferLoad}
             onExpandTree={expandTreeOptions}
           />

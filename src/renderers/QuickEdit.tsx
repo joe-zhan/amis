@@ -464,8 +464,7 @@ export const HocQuickEdit =
               formLazyChange: false,
               ref: this.formRef,
               popOverContainer: () => this.overlay,
-              canAccessSuperData,
-              formStore: undefined
+              canAccessSuperData
             })}
           </div>
         );

@@ -46,7 +46,6 @@ export interface AnchorNavProps extends ThemeProps {
     props?: AnchorNavProps
   ) => JSX.Element; // 锚点区域渲染器
   onSelect?: (key: string | number) => void; // 选中回调方法
-  direction?: 'vertical' | 'horizontal'; // 导航方向
 }
 
 export interface AnchorNavState {
@@ -57,11 +56,10 @@ export interface AnchorNavState {
 export class AnchorNav extends React.Component<AnchorNavProps, AnchorNavState> {
   static defaultProps: Pick<
     AnchorNavProps,
-    'linkClassName' | 'sectionClassName' | 'direction'
+    'linkClassName' | 'sectionClassName'
   > = {
     linkClassName: '',
-    sectionClassName: '',
-    direction: 'vertical'
+    sectionClassName: ''
   };
 
   // 滚动区域DOM
@@ -216,8 +214,7 @@ export class AnchorNav extends React.Component<AnchorNavProps, AnchorNavState> {
       className,
       linkClassName,
       sectionClassName,
-      children,
-      direction
+      children
     } = this.props;
 
     if (!Array.isArray(children)) {
@@ -225,15 +222,7 @@ export class AnchorNav extends React.Component<AnchorNavProps, AnchorNavState> {
     }
 
     return (
-      <div
-        className={cx(
-          'AnchorNav',
-          {
-            [`AnchorNav--${direction}`]: direction
-          },
-          className
-        )}
-      >
+      <div className={cx(`AnchorNav`, className)}>
         <ul
           className={cx('AnchorNav-link-wrap', linkClassName)}
           role="anchorlist"

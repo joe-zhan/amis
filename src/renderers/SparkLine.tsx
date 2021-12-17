@@ -36,11 +36,6 @@ export interface SparkLineSchema extends BaseSchema {
    */
   clickAction?: ActionSchema;
 
-  /**
-   * 空数据时显示的内容
-   */
-  placeholder?: string;
-
   // /**
   //  * 线的转折是否要有圆角。默认为 2
   //  */

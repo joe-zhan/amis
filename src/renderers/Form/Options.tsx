@@ -48,8 +48,6 @@ import {
   SchemaObject,
   SchemaTokenizeableString
 } from '../../Schema';
-import isPlainObject from 'lodash/isPlainObject';
-import merge from 'lodash/merge';
 
 export {Option};
 
@@ -272,10 +270,8 @@ export function registerOptionsControl(config: OptionsConfig) {
       : [];
     static ComposedComponent = Control;
 
-    toDispose: Array<() => void> = [];
-
+    reaction?: () => void;
     input: any;
-    mounted = false;
 
     constructor(props: OptionsProps) {
       super(props);
@@ -305,18 +301,9 @@ export function registerOptionsControl(config: OptionsConfig) {
           data
         );
 
-        this.toDispose.push(
-          reaction(
-            () => JSON.stringify([formItem.loading, formItem.filteredOptions]),
-            () => this.mounted && this.forceUpdate()
-          )
-        );
-
-        this.toDispose.push(
-          reaction(
-            () => JSON.stringify(formItem.options),
-            () => this.mounted && this.syncAutoFill(formItem.tmpValue)
-          )
+        this.reaction = reaction(
+          () => JSON.stringify([formItem.loading, formItem.filteredOptions]),
+          () => this.forceUpdate()
         );
         // 默认全选。这里会和默认值\回填值逻辑冲突，所以如果有配置source则不执行默认全选
         if (
@@ -353,7 +340,6 @@ export function registerOptionsControl(config: OptionsConfig) {
     }
 
     componentDidMount() {
-      this.mounted = true;
       this.normalizeValue();
 
       if (this.props.value) {
@@ -444,20 +430,14 @@ export function registerOptionsControl(config: OptionsConfig) {
 
     componentWillUnmount() {
       this.props.removeHook?.(this.reload, 'init');
-      this.toDispose.forEach(fn => fn());
-      this.toDispose = [];
+      this.reaction?.();
     }
 
     syncAutoFill(value: any) {
       const {autoFill, multiple, onBulkChange, data} = this.props;
       const formItem = this.props.formItem as IFormItemStore;
 
-      if (
-        onBulkChange &&
-        autoFill &&
-        !isEmpty(autoFill) &&
-        formItem.filteredOptions.length
-      ) {
+      if (autoFill && !isEmpty(autoFill) && formItem.filteredOptions.length) {
         const selectedOptions = formItem.getSelectedOptions(value);
         const toSync = dataMapping(
           autoFill,
@@ -489,14 +469,7 @@ export function registerOptionsControl(config: OptionsConfig) {
                 selectedOptions[0]
               )
         );
-
-        Object.keys(toSync).forEach(key => {
-          if (isPlainObject(toSync[key]) && isPlainObject(data[key])) {
-            toSync[key] = merge({}, data[key], toSync[key]);
-          }
-        });
-
-        onBulkChange(toSync);
+        onBulkChange?.(toSync);
       }
     }
 
@@ -887,19 +860,7 @@ export function registerOptionsControl(config: OptionsConfig) {
               body: {
                 type: 'form',
                 api: addApi,
-                controls: [
-                  {
-                    type: 'hidden',
-                    name: 'idx',
-                    value: idx
-                  },
-                  {
-                    type: 'hidden',
-                    name: 'parent',
-                    value: parent
-                  },
-                  ...(addControls || [])
-                ]
+                controls: addControls
               }
             },
             ctx

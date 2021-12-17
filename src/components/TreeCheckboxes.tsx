@@ -1,4 +1,4 @@
-import {BaseSelection, BaseSelectionProps} from './Selection';
+import {BaseCheckboxes, BaseCheckboxesProps} from './Checkboxes';
 import {themeable} from '../theme';
 import React from 'react';
 import {uncontrollable} from 'uncontrollable';
@@ -9,25 +9,25 @@ import Spinner from './Spinner';
 import {localeable} from '../locale';
 import {Icon} from './icons';
 
-export interface TreeSelectionProps extends BaseSelectionProps {
+export interface TreeCheckboxesProps extends BaseCheckboxesProps {
   expand?: 'all' | 'first' | 'root' | 'none';
 }
 
-export interface TreeSelectionState {
+export interface TreeCheckboxesState {
   expanded: Array<string>;
 }
 
-export class TreeSelection extends BaseSelection<
-  TreeSelectionProps,
-  TreeSelectionState
+export class TreeCheckboxes extends BaseCheckboxes<
+  TreeCheckboxesProps,
+  TreeCheckboxesState
 > {
   valueArray: Array<Option>;
-  state: TreeSelectionState = {
+  state: TreeCheckboxesState = {
     expanded: []
   };
 
   static defaultProps = {
-    ...BaseSelection.defaultProps,
+    ...BaseCheckboxes.defaultProps,
     expand: 'first' as 'first'
   };
 
@@ -35,7 +35,7 @@ export class TreeSelection extends BaseSelection<
     this.syncExpanded();
   }
 
-  componentDidUpdate(prevProps: TreeSelectionProps) {
+  componentDidUpdate(prevProps: TreeCheckboxesProps) {
     const props = this.props;
 
     if (
@@ -82,9 +82,7 @@ export class TreeSelection extends BaseSelection<
       option2value,
       options,
       onDeferLoad,
-      disabled,
-      multiple,
-      clearable
+      disabled
     } = this.props;
 
     if (disabled || option.disabled) {
@@ -94,13 +92,12 @@ export class TreeSelection extends BaseSelection<
       return;
     }
 
-    let valueArray = BaseSelection.value2array(value, options, option2value);
+    let valueArray = BaseCheckboxes.value2array(value, options, option2value);
 
     if (
       option.value === void 0 &&
       Array.isArray(option.children) &&
-      option.children.length &&
-      multiple
+      option.children.length
     ) {
       const someCheckedFn = (child: Option) =>
         (Array.isArray(child.children) && child.children.length
@@ -127,12 +124,10 @@ export class TreeSelection extends BaseSelection<
     } else {
       let idx = valueArray.indexOf(option);
 
-      if (~idx && (multiple || clearable)) {
+      if (~idx) {
         valueArray.splice(idx, 1);
-      } else if (multiple) {
-        valueArray.push(option);
       } else {
-        valueArray = [option];
+        valueArray.push(option);
       }
     }
 
@@ -140,7 +135,7 @@ export class TreeSelection extends BaseSelection<
       ? valueArray.map(item => option2value(item))
       : valueArray;
 
-    onChange && onChange(multiple ? newValue : newValue[0]);
+    onChange && onChange(newValue);
   }
 
   toggleCollapsed(option: Option, index: string) {
@@ -168,8 +163,7 @@ export class TreeSelection extends BaseSelection<
       disabled,
       classnames: cx,
       itemClassName,
-      itemRender,
-      multiple
+      itemRender
     } = this.props;
     const id = indexes.join('-');
     const valueArray = this.valueArray;
@@ -210,7 +204,7 @@ export class TreeSelection extends BaseSelection<
       <div
         key={index}
         className={cx(
-          'TreeSelection-item',
+          'TreeCheckboxes-item',
           disabled || option.disabled || (option.defer && option.loading)
             ? 'is-disabled'
             : '',
@@ -219,10 +213,9 @@ export class TreeSelection extends BaseSelection<
       >
         <div
           className={cx(
-            'TreeSelection-itemInner',
+            'TreeCheckboxes-itemInner',
             itemClassName,
-            option.className,
-            checked ? 'is-active' : ''
+            option.className
           )}
           onClick={() => this.toggleOption(option)}
         >
@@ -238,13 +231,13 @@ export class TreeSelection extends BaseSelection<
             </a>
           ) : null}
 
-          <div className={cx('TreeSelection-itemLabel')}>
+          <div className={cx('TreeCheckboxes-itemLabel')}>
             {itemRender(option)}
           </div>
 
           {option.defer && option.loading ? <Spinner show size="sm" /> : null}
 
-          {multiple && (!option.defer || option.loaded) ? (
+          {!option.defer || option.loaded ? (
             <Checkbox
               size="sm"
               checked={checked}
@@ -256,7 +249,7 @@ export class TreeSelection extends BaseSelection<
           ) : null}
         </div>
         {hasChildren ? (
-          <div className={cx('TreeSelection-sublist')}>
+          <div className={cx('TreeCheckboxes-sublist')}>
             {option.children!.map((option, key) =>
               this.renderItem(option, key, indexes.concat(key))
             )}
@@ -277,7 +270,7 @@ export class TreeSelection extends BaseSelection<
       translate: __
     } = this.props;
 
-    this.valueArray = BaseSelection.value2array(value, options, option2value);
+    this.valueArray = BaseCheckboxes.value2array(value, options, option2value);
     let body: Array<React.ReactNode> = [];
 
     if (Array.isArray(options) && options.length) {
@@ -285,11 +278,11 @@ export class TreeSelection extends BaseSelection<
     }
 
     return (
-      <div className={cx('TreeSelection', className)}>
+      <div className={cx('TreeCheckboxes', className)}>
         {body && body.length ? (
           body
         ) : (
-          <div className={cx('TreeSelection-placeholder')}>
+          <div className={cx('TreeCheckboxes-placeholder')}>
             {__(placeholder)}
           </div>
         )}
@@ -300,7 +293,7 @@ export class TreeSelection extends BaseSelection<
 
 export default themeable(
   localeable(
-    uncontrollable(TreeSelection, {
+    uncontrollable(TreeCheckboxes, {
       value: 'onChange'
     })
   )

@@ -20,8 +20,7 @@ import {
   buildApi,
   isApiOutdated,
   isEffectiveApi,
-  normalizeApi,
-  normalizeApiResponseData
+  normalizeApi
 } from '../utils/api';
 
 /**
@@ -73,7 +72,7 @@ export const Store = StoreNode.named('MappingStore')
           const ret: Payload = yield env.fetcher(api, data);
 
           if (ret.ok) {
-            const data = normalizeApiResponseData(ret.data);
+            const data = ret.data || {};
             (self as any).setMap(data);
           } else {
             throw new Error(ret.msg || 'fetch error');
@@ -176,7 +175,7 @@ export const MappingField = withStore(props =>
       }
     }
 
-    renderSingleValue(key: any, reactKey?: number) {
+    render() {
       const {
         className,
         placeholder,
@@ -186,13 +185,17 @@ export const MappingField = withStore(props =>
         data,
         store
       } = this.props;
+      const map = store.map;
+
+      let key = getPropValue(this.props);
+
       let viewValue: React.ReactNode = (
         <span className="text-muted">{placeholder}</span>
       );
-      const map = store.map;
+
+      key = typeof key === 'string' ? key.trim() : key; // trim 一下，干掉一些空白字符。
       let value: any = undefined;
-      // trim 一下，干掉一些空白字符。
-      key = typeof key === 'string' ? key.trim() : key;
+
       if (
         typeof key !== 'undefined' &&
         map &&
@@ -207,26 +210,7 @@ export const MappingField = withStore(props =>
         viewValue = render('tpl', value);
       }
 
-      return (
-        <span key={`map-${reactKey}`} className={cx('MappingField', className)}>
-          {viewValue}
-        </span>
-      );
-    }
-
-    render() {
-      const mapKey = getPropValue(this.props);
-      if (Array.isArray(mapKey)) {
-        return (
-          <span>
-            {mapKey.map((singleKey: string, index: number) =>
-              this.renderSingleValue(singleKey, index)
-            )}
-          </span>
-        );
-      } else {
-        return this.renderSingleValue(mapKey, 0);
-      }
+      return <span className={cx('MappingField', className)}>{viewValue}</span>;
     }
   }
 );

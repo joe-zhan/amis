@@ -116,14 +116,12 @@ export class RootRenderer extends React.Component<RootRendererProps> {
       );
     } else if (action.actionType === 'email') {
       const mailTo = filter(action.to, ctx);
-      const mailInfo = mapValues(
-        pick(action, 'to', 'cc', 'bcc', 'subject', 'body'),
-        val => filter(val, ctx)
-      );
+      const mailInfo = mapValues(pick(action, 'to', 'cc', 'bcc', 'subject', 'body'), val => filter(val, ctx));
       const mailStr = qs.stringify(mailInfo);
       const mailto = `mailto:${mailTo}?${mailStr}`;
 
       window.open(mailto);
+
     } else if (action.actionType === 'dialog') {
       store.setCurrentAction(action);
       store.openDialog(ctx);
@@ -161,10 +159,7 @@ export class RootRenderer extends React.Component<RootRendererProps> {
       action.actionType === 'copy' &&
       (action.content || action.copy)
     ) {
-      env.copy &&
-        env.copy(filter(action.content || action.copy, ctx, '| raw'), {
-          format: action.copyFormat
-        });
+      env.copy && env.copy(filter(action.content || action.copy, ctx, '| raw'));
     }
   }
 
@@ -184,12 +179,12 @@ export class RootRenderer extends React.Component<RootRendererProps> {
       return;
     }
 
-    store.closeDialog(true);
+    store.closeDialog();
   }
 
-  handleDialogClose(confirmed = false) {
+  handleDialogClose() {
     const store = this.store;
-    store.closeDialog(confirmed);
+    store.closeDialog();
   }
 
   handleDrawerConfirm(values: object[], action: Action, ...args: Array<any>) {

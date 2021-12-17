@@ -1,7 +1,7 @@
 import React from 'react';
 import {Renderer, RendererProps} from '../factory';
 import {BaseSchema, SchemaCollection} from '../Schema';
-import {resolveVariable, resolveVariableAndFilter} from '../utils/tpl-builtin';
+import {resolveVariable} from '../utils/tpl-builtin';
 import mapValues from 'lodash/mapValues';
 
 /**
@@ -43,7 +43,7 @@ export default class WebComponent extends React.Component<RendererProps> {
 
     const propsValues = mapValues(props, s => {
       if (typeof s === 'string') {
-        return resolveVariableAndFilter(s, data, '| raw') || s;
+        return resolveVariable(s, data) || s;
       } else {
         return s;
       }

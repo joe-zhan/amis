@@ -1,13 +1,7 @@
 import React from 'react';
 import {FormItem, FormControlProps, FormBaseControl} from './Item';
 import Button from '../../components/Button';
-import {
-  createObject,
-  getTree,
-  getVariable,
-  setVariable,
-  spliceTree
-} from '../../utils/helper';
+import {createObject, getTree, spliceTree} from '../../utils/helper';
 import {RendererData, Action, Api, Payload, ApiObject} from '../../types';
 import {isEffectiveApi} from '../../utils/api';
 import {filter} from '../../utils/tpl';
@@ -31,26 +25,6 @@ export interface TableControlSchema
   addable?: boolean;
 
   /**
-   * 可复制新增
-   */
-  copyable?: boolean;
-
-  /**
-   * 复制按钮文字
-   */
-  copyBtnLabel?: string;
-
-  /**
-   * 复制按钮图标
-   */
-  copyBtnIcon?: string;
-
-  /**
-   * 是否显示复制按钮
-   */
-  copyAddBtn?: boolean;
-
-  /**
    * 是否可以拖拽排序
    */
   draggable?: boolean;
@@ -61,12 +35,12 @@ export interface TableControlSchema
   addApi?: SchemaApi;
 
   /**
-   * 新增按钮文字
+   * 新增按钮
    */
   addBtnLabel?: string;
 
   /**
-   * 新增按钮图标
+   * 新增图标
    */
   addBtnIcon?: string;
 
@@ -93,12 +67,12 @@ export interface TableControlSchema
   /**
    * 更新按钮名称
    */
-  editBtnLabel?: string;
+  updateBtnLabel?: string;
 
   /**
    * 更新按钮图标
    */
-  editBtnIcon?: string;
+  updateBtnIcon?: string;
 
   /**
    * 确认按钮文字
@@ -200,8 +174,7 @@ export default class FormTable extends React.Component<TableProps, TableState> {
     placeholder: '空',
     scaffold: {},
     addBtnIcon: 'plus',
-    copyBtnIcon: 'copy',
-    editBtnIcon: 'pencil',
+    updateBtnIcon: 'pencil',
     deleteBtnIcon: 'minus',
     confirmBtnIcon: 'check',
     cancelBtnIcon: 'close',
@@ -217,14 +190,12 @@ export default class FormTable extends React.Component<TableProps, TableState> {
     'showAddBtn',
     'addable',
     'removable',
-    'copyable',
     'editable',
     'addApi',
     'updateApi',
     'deleteApi',
     'needConfirm',
-    'canAccessSuperData',
-    'formStore'
+    'canAccessSuperData'
   ];
 
   entries: SimpleMap<any, number>;
@@ -284,8 +255,8 @@ export default class FormTable extends React.Component<TableProps, TableState> {
     this.subForms[`${x}-${y}`] = form;
   }
 
-  async validate(): Promise<string | void> {
-    const {value, minLength, maxLength, translate: __, columns} = this.props;
+  validate(): any {
+    const {value, minLength, maxLength, translate: __} = this.props;
 
     // todo: 如果当前正在编辑中，表单提交了，应该先让正在编辑的东西提交然后再做验证。
     if (~this.state.editIndex) {
@@ -302,43 +273,15 @@ export default class FormTable extends React.Component<TableProps, TableState> {
         key => this.subForms[key] && subForms.push(this.subForms[key])
       );
       if (subForms.length) {
-        const results = await Promise.all(
-          subForms.map(item => item.validate())
-        );
-
-        let msg = ~results.indexOf(false) ? __('Form.validateFailed') : '';
-        let uniqueColumn = '';
-
-        if (
-          !msg &&
-          Array.isArray(columns) &&
-          Array.isArray(value) &&
-          columns.some(item => {
-            if (item.unique && item.name) {
-              let exists: Array<any> = [];
-
-              return value.some((obj: any) => {
-                const value = getVariable(obj, item.name);
-
-                if (~exists.indexOf(value)) {
-                  uniqueColumn = `${item.label || item.name}`;
-                  return true;
-                }
-
-                exists.push(value);
-                return false;
-              });
+        return Promise.all(subForms.map(item => item.validate())).then(
+          values => {
+            if (~values.indexOf(false)) {
+              return __('Form.validateFailed');
             }
 
-            return false;
-          })
-        ) {
-          msg = __('InputTable.uniqueError', {
-            label: uniqueColumn
-          });
-        }
-
-        return msg;
+            return;
+          }
+        );
       }
     }
   }
@@ -453,47 +396,12 @@ export default class FormTable extends React.Component<TableProps, TableState> {
     return onAction && onAction(action, ctx, ...rest);
   }
 
-  copyItem(index: number) {
-    const {needConfirm} = this.props;
-    const items = this.state.items.concat();
-
-    items.splice(index + 1, 0, items[index]);
-    index = Math.min(index + 1, items.length - 1);
-    this.setState(
-      {
-        items
-      },
-      () => {
-        if (needConfirm === false) {
-          this.emitValue();
-        } else {
-          this.startEdit(index, true);
-        }
-      }
-    );
-  }
-
   addItem(index: number) {
-    const {needConfirm, scaffold, columns} = this.props;
+    const {needConfirm, payload} = this.props;
     const items = this.state.items.concat();
-    let value: any = {
+    const value = {
+      ...payload,
       __isPlaceholder: true
-    };
-
-    if (Array.isArray(columns)) {
-      columns.forEach(column => {
-        if (
-          typeof column.value !== 'undefined' &&
-          typeof column.name === 'string'
-        ) {
-          setVariable(value, column.name, column.value);
-        }
-      });
-    }
-
-    value = {
-      ...value,
-      ...scaffold
     };
 
     if (needConfirm === false) {
@@ -703,38 +611,6 @@ export default class FormTable extends React.Component<TableProps, TableState> {
       });
     }
 
-    if (props.copyable && props.showCopyBtn !== false) {
-      btns.push({
-        children: ({
-          key,
-          rowIndex,
-          offset
-        }: {
-          key: any;
-          rowIndex: number;
-          offset: number;
-        }) =>
-          ~this.state.editIndex && needConfirm !== false ? null : (
-            <Button
-              classPrefix={ns}
-              size="sm"
-              key={key}
-              level="link"
-              tooltip={__('Table.copyRow')}
-              tooltipContainer={
-                env && env.getModalContainer ? env.getModalContainer : undefined
-              }
-              onClick={this.copyItem.bind(this, rowIndex + offset, undefined)}
-            >
-              {props.copyBtnLabel ? <span>{props.copyBtnLabel}</span> : null}
-              {props.copyBtnIcon ? (
-                <Icon icon={props.copyBtnIcon} className="icon" />
-              ) : null}
-            </Button>
-          )
-      });
-    }
-
     if (props.needConfirm === false) {
       columns = columns.map(column => {
         const quickEdit = column.quickEdit;
@@ -798,16 +674,11 @@ export default class FormTable extends React.Component<TableProps, TableState> {
                 }
                 onClick={() => this.startEdit(rowIndex + offset)}
               >
-                {props.updateBtnLabel || props.editBtnLabel ? (
-                  <span>{props.updateBtnLabel || props.editBtnLabel}</span>
+                {props.updateBtnLabel ? (
+                  <span>{props.updateBtnLabel}</span>
                 ) : null}
-                {/* 兼容之前的写法 */}
-                {typeof props.updateBtnIcon !== 'undefined' ? (
-                  props.updateBtnIcon ? (
-                    <Icon icon={props.updateBtnIcon} className="icon" />
-                  ) : null
-                ) : props.editBtnIcon ? (
-                  <Icon icon={props.editBtnIcon} className="icon" />
+                {props.updateBtnIcon ? (
+                  <Icon icon={props.updateBtnIcon} className="icon" />
                 ) : null}
               </Button>
             )

@@ -10,8 +10,7 @@ import {
   extendObject,
   guid,
   isObjectShallowModified,
-  syncDataFromSuper,
-  isSuperDataModified
+  syncDataFromSuper
 } from './utils/helper';
 import {dataMapping} from './utils/tpl-builtin';
 import {RootStoreContext} from './WithRootStore';
@@ -175,9 +174,7 @@ export function HocStoreFactory(renderer: {
           }
         } else if (
           shouldSync === true ||
-          isObjectShallowModified(prevProps.data, props.data) ||
-          (props.syncSuperStore !== false &&
-            isSuperDataModified(props.data, prevProps.data, store))
+          isObjectShallowModified(prevProps.data, props.data)
         ) {
           if (props.store && props.store.data === props.data) {
             store.initData(

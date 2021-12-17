@@ -6,7 +6,6 @@
 import React from 'react';
 
 import CloseIcon from '../icons/close.svg';
-import StatusCloseIcon from '../icons/status-close.svg';
 import UnDoIcon from '../icons/undo.svg';
 import ReDoIcon from '../icons/redo.svg';
 import EnterIcon from '../icons/enter.svg';
@@ -24,12 +23,7 @@ import ViewIcon from '../icons/view.svg';
 import RemoveIcon from '../icons/remove.svg';
 import RetryIcon from '../icons/retry.svg';
 import UploadIcon from '../icons/upload.svg';
-import DownloadIcon from '../icons/download.svg';
 import FileIcon from '../icons/file.svg';
-import StatusSuccessIcon from '../icons/status-success.svg';
-import StatusFailIcon from '../icons/status-fail.svg';
-import StatusInfoIcon from '../icons/status-info.svg';
-import StatusWarningIcon from '../icons/status-warning.svg';
 import SuccessIcon from '../icons/success.svg';
 import FailIcon from '../icons/fail.svg';
 import SearchIcon from '../icons/search.svg';
@@ -42,8 +36,6 @@ import ReloadIcon from '../icons/reload.svg';
 import ExchangeIcon from '../icons/exchange.svg';
 import ColmunsIcon from '../icons/columns.svg';
 import CalendarIcon from '../icons/calendar.svg';
-import ClockIcon from '../icons/clock.svg';
-
 import CopyIcon from '../icons/copy.svg';
 import FilterIcon from '../icons/filter.svg';
 import CaretIcon from '../icons/caret.svg';
@@ -69,11 +61,6 @@ import EllipsisVIcon from '../icons/ellipsis-v.svg';
 import ExpandAltIcon from '../icons/expand-alt.svg';
 import CompressAltIcon from '../icons/compress-alt.svg';
 import TransparentIcon from '../icons/transparent.svg';
-import LoadingOutline from '../icons/loading-outline.svg';
-import AlertSuccess from '../icons/alert-success.svg';
-import AlertInfo from '../icons/alert-info.svg';
-import AlertWarning from '../icons/alert-warning.svg';
-import AlertDanger from '../icons/alert-danger.svg';
 
 // 兼容原来的用法，后续不直接试用。
 
@@ -104,7 +91,6 @@ export function registerIcon(key: string, component: React.ReactType<{}>) {
 }
 
 registerIcon('close', CloseIcon);
-registerIcon('status-close', StatusCloseIcon);
 registerIcon('undo', UnDoIcon);
 registerIcon('redo', ReDoIcon);
 registerIcon('enter', EnterIcon);
@@ -125,12 +111,7 @@ registerIcon('view', ViewIcon);
 registerIcon('remove', RemoveIcon);
 registerIcon('retry', RetryIcon);
 registerIcon('upload', UploadIcon);
-registerIcon('download', DownloadIcon);
 registerIcon('file', FileIcon);
-registerIcon('status-success', StatusSuccessIcon);
-registerIcon('status-fail', StatusFailIcon);
-registerIcon('status-info', StatusInfoIcon);
-registerIcon('status-warning', StatusWarningIcon);
 registerIcon('success', SuccessIcon);
 registerIcon('fail', FailIcon);
 registerIcon('warning', WarningIcon);
@@ -146,7 +127,6 @@ registerIcon('reload', ReloadIcon);
 registerIcon('exchange', ExchangeIcon);
 registerIcon('columns', ColmunsIcon);
 registerIcon('calendar', CalendarIcon);
-registerIcon('clock', ClockIcon);
 registerIcon('copy', CopyIcon);
 registerIcon('filter', FilterIcon);
 registerIcon('column-filter', ColumnFilterIcon);
@@ -169,11 +149,6 @@ registerIcon('ellipsis-v', EllipsisVIcon);
 registerIcon('expand-alt', ExpandAltIcon);
 registerIcon('compress-alt', CompressAltIcon);
 registerIcon('transparent', TransparentIcon);
-registerIcon('loading-outline', LoadingOutline);
-registerIcon('alert-success', AlertSuccess);
-registerIcon('alert-info', AlertInfo);
-registerIcon('alert-warning', AlertWarning);
-registerIcon('alert-danger', AlertDanger);
 
 export function Icon({
   icon,

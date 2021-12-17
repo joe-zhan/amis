@@ -2,7 +2,6 @@ import React from 'react';
 import {toast} from '../../src/components/Toast';
 import {render, makeTranslator} from '../../src/index';
 import {normalizeLink} from '../../src/utils/normalizeLink';
-import attachmentAdpator from '../../src/utils/attachmentAdpator';
 import {alert, confirm} from '../../src/components/Alert';
 import axios from 'axios';
 import JSON5 from 'json5';
@@ -145,57 +144,32 @@ export default class PlayGround extends React.Component {
           router.push(to);
         }
       },
-      fetcher: async api => {
-        let {url, method, data, responseType, config, headers} = api;
-        config = config || {};
-        config.url = url;
-        config.withCredentials = true;
-        responseType && (config.responseType = responseType);
+      fetcher: async config => {
+        config = {
+          dataType: 'json',
+          ...config
+        };
 
-        if (config.cancelExecutor) {
-          config.cancelToken = new axios.CancelToken(config.cancelExecutor);
-        }
-
-        config.headers = headers || {};
-        config.method = method;
-        config.data = data;
-
-        if (method === 'get' && data) {
-          config.params = data;
-        } else if (data && data instanceof FormData) {
-          // config.headers['Content-Type'] = 'multipart/form-data';
-        } else if (
-          data &&
-          typeof data !== 'string' &&
-          !(data instanceof Blob) &&
-          !(data instanceof ArrayBuffer)
-        ) {
-          data = JSON.stringify(data);
+        if (config.dataType === 'json' && config.data) {
+          config.data = JSON.stringify(config.data);
+          config.headers = config.headers || {};
           config.headers['Content-Type'] = 'application/json';
         }
 
         // 支持返回各种报错信息
-        config.validateStatus = function () {
+        config.validateStatus = function (status) {
           return true;
         };
 
-        let response = await axios(config);
-        response = await attachmentAdpator(response, __);
+        const response = await axios[config.method](
+          config.url,
+          config.data,
+          config
+        );
 
         if (response.status >= 400) {
           if (response.data) {
-            // 主要用于 raw: 模式下，后端自己校验登录，
-            if (
-              response.status === 401 &&
-              response.data.location &&
-              response.data.location.startsWith('http')
-            ) {
-              location.href = response.data.location.replace(
-                '{{redirect}}',
-                encodeURIComponent(location.href)
-              );
-              return new Promise(() => {});
-            } else if (response.data.msg) {
+            if (response.data.msg) {
               throw new Error(response.data.msg);
             } else {
               throw new Error(
@@ -209,25 +183,16 @@ export default class PlayGround extends React.Component {
             );
           }
         }
-
         return response;
       },
       isCancel: value => axios.isCancel(value),
-      notify: (type, msg, conf) =>
-        toast[type]
-          ? toast[type](msg, conf)
-          : console.warn('[Notify]', type, msg),
+      notify: (type, msg) =>
+        toast[type] ? toast[type](msg) : console.warn('[Notify]', type, msg),
       alert,
       confirm,
-      copy: (content, options) => {
-        copy(content, options);
+      copy: content => {
+        copy(content);
         toast.success(__('System.copy'));
-      },
-      tracker(eventTrack) {
-        console.debug('eventTrack', eventTrack);
-      },
-      replaceText: {
-        AMIS_HOST: 'https://baidu.gitee.io/amis'
       }
     };
 
@@ -324,8 +289,7 @@ export default class PlayGround extends React.Component {
       theme: this.props.theme,
       locale: this.props.locale,
       affixHeader: false,
-      affixFooter: false,
-      useMobileUI: true
+      affixFooter: false
     };
 
     if (this.props.viewMode === 'mobile') {
@@ -447,9 +411,6 @@ export default class PlayGround extends React.Component {
       <CodeEditor
         value={this.state.schemaCode}
         onChange={this.handleChange}
-        options={{
-          lineNumbers: 'off'
-        }}
         // editorFactory={this.editorFactory}
         editorDidMount={this.editorDidMount}
         language="json"

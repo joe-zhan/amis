@@ -56,17 +56,10 @@ interface SearchBoxProps
   onQuery?: (query: {[propName: string]: string}) => void;
 }
 
-export interface SearchBoxState {
-  value: string;
-}
-
 @Renderer({
   type: 'search-box'
 })
-export class SearchBoxRenderer extends React.Component<
-  SearchBoxProps,
-  SearchBoxState
-> {
+export class SearchBoxRenderer extends React.Component<SearchBoxProps> {
   static defaultProps = {
     name: 'keywords',
     mini: false,
@@ -74,18 +67,6 @@ export class SearchBoxRenderer extends React.Component<
   };
 
   static propsList: Array<string> = ['mini', 'searchImediately'];
-
-  constructor(props: SearchBoxProps) {
-    super(props);
-    this.state = {
-      value: getPropValue(props) || ''
-    };
-  }
-
-  @autobind
-  handleChange(value: string) {
-    this.setState({value});
-  }
 
   @autobind
   handleCancel() {
@@ -119,7 +100,7 @@ export class SearchBoxRenderer extends React.Component<
       className
     } = this.props;
 
-    const value = this.state.value;
+    const value = getPropValue(this.props);
 
     return (
       <SearchBox
@@ -128,13 +109,13 @@ export class SearchBoxRenderer extends React.Component<
         disabled={!onQuery}
         defaultActive={!!value}
         defaultValue={onChange ? undefined : value}
-        value={value}
+        value={onChange ? value : undefined}
         mini={mini}
         searchImediately={searchImediately}
         onSearch={this.handleSearch}
         onCancel={this.handleCancel}
         placeholder={placeholder}
-        onChange={this.handleChange}
+        onChange={onChange}
       />
     );
   }

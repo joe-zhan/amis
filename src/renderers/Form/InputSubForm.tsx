@@ -142,8 +142,6 @@ export default class SubFormControl extends React.PureComponent<
     placeholder: 'placeholder.empty'
   };
 
-  static propsList: Array<string> = ['form', 'formStore'];
-
   state: SubFormState = {};
   dragTip?: HTMLElement;
   sortable?: Sortable;
@@ -508,8 +506,7 @@ export default class SubFormControl extends React.PureComponent<
           show: !!dialogCtx,
           onClose: this.close,
           onConfirm: this.handleDialogConfirm,
-          data: dialogData,
-          formStore: undefined
+          data: dialogData
         })}
       </div>
     );

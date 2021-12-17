@@ -98,8 +98,6 @@ export interface PanelProps
 export default class Panel extends React.Component<PanelProps> {
   static propsList: Array<string> = [
     'header',
-    'actions',
-    'children',
     'headerClassName',
     'footerClassName',
     'footerWrapClassName',

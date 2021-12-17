@@ -251,6 +251,7 @@ export interface ComboControlSchema extends FormBaseControl {
     /**
      * 最大值验证错误提示
      */
+
     maxLengthValidateFailed?: string;
   };
 }
@@ -333,8 +334,7 @@ export default class ComboControl extends React.Component<ComboProps> {
     'strictMode',
     'items',
     'conditions',
-    'messages',
-    'formStore'
+    'messages'
   ];
 
   subForms: Array<any> = [];
@@ -367,8 +367,15 @@ export default class ComboControl extends React.Component<ComboProps> {
       ...props.scaffold
     };
 
-    const {store, value, multiple, minLength, maxLength, formItem, addHook} =
-      props;
+    const {
+      store,
+      value,
+      multiple,
+      minLength,
+      maxLength,
+      formItem,
+      addHook
+    } = props;
 
     store.config({
       multiple,
@@ -444,8 +451,14 @@ export default class ComboControl extends React.Component<ComboProps> {
   }
 
   addItemWith(condition: ComboCondition) {
-    const {flat, joinValues, delimiter, scaffold, disabled, submitOnChange} =
-      this.props;
+    const {
+      flat,
+      joinValues,
+      delimiter,
+      scaffold,
+      disabled,
+      submitOnChange
+    } = this.props;
 
     if (disabled) {
       return;
@@ -470,8 +483,14 @@ export default class ComboControl extends React.Component<ComboProps> {
   }
 
   addItem() {
-    const {flat, joinValues, delimiter, scaffold, disabled, submitOnChange} =
-      this.props;
+    const {
+      flat,
+      joinValues,
+      delimiter,
+      scaffold,
+      disabled,
+      submitOnChange
+    } = this.props;
 
     if (disabled) {
       return;
@@ -543,8 +562,14 @@ export default class ComboControl extends React.Component<ComboProps> {
   }
 
   handleChange(values: any, diff: any, {index}: any) {
-    const {flat, store, joinValues, delimiter, disabled, submitOnChange} =
-      this.props;
+    const {
+      flat,
+      store,
+      joinValues,
+      delimiter,
+      disabled,
+      submitOnChange
+    } = this.props;
 
     if (disabled) {
       return;
@@ -756,8 +781,8 @@ export default class ComboControl extends React.Component<ComboProps> {
     [propName: number]: any;
   } = {};
 
-  makeFormRef = memoize(
-    (index: number) => (ref: any) => this.formRef(ref, index)
+  makeFormRef = memoize((index: number) => (ref: any) =>
+    this.formRef(ref, index)
   );
 
   formRef(ref: any, index: number = 0) {
@@ -1009,7 +1034,7 @@ export default class ComboControl extends React.Component<ComboProps> {
                 {deleteIcon ? (
                   <i className={deleteIcon} />
                 ) : (
-                  <Icon icon="status-close" className="icon" />
+                  <Icon icon="close" className="icon" />
                 )}
               </div>
             );
@@ -1088,8 +1113,7 @@ export default class ComboControl extends React.Component<ComboProps> {
                       lazyChange: changeImmediately ? false : true,
                       formLazyChange: false,
                       value: undefined,
-                      formItemValue: undefined,
-                      formStore: undefined
+                      formItemValue: undefined
                     }
                   )
                 ) : (
@@ -1188,7 +1212,7 @@ export default class ComboControl extends React.Component<ComboProps> {
                     {deleteIcon ? (
                       <i className={deleteIcon} />
                     ) : (
-                      <Icon icon="status-close" className="icon" />
+                      <Icon icon="close" className="icon" />
                     )}
                   </a>
                 );
@@ -1273,8 +1297,7 @@ export default class ComboControl extends React.Component<ComboProps> {
                           lazyLoad,
                           canAccessSuperData,
                           value: undefined,
-                          formItemValue: undefined,
-                          formStore: undefined
+                          formItemValue: undefined
                         }
                       )
                     ) : (
@@ -1407,8 +1430,7 @@ export default class ComboControl extends React.Component<ComboProps> {
                   onChange: this.handleSingleFormChange,
                   ref: this.makeFormRef(0),
                   onInit: this.handleSingleFormInit,
-                  canAccessSuperData,
-                  formStore: undefined
+                  canAccessSuperData
                 }
               )
             ) : (
@@ -1451,10 +1473,3 @@ export default class ComboControl extends React.Component<ComboProps> {
   extendsData: false
 })
 export class ComboControlRenderer extends ComboControl {}
-
-@FormItem({
-  type: 'input-kv',
-  storeType: ComboStore.name,
-  extendsData: false
-})
-export class KVControlRenderer extends ComboControl {}

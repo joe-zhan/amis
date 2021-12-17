@@ -26,4 +26,5 @@ jobs:
         run: |
           npm i
           npm test
-          sh deploy-gh-pages.sh
+          npm run build-schemas
+          ./node_modules/.bin/tsc --declaration --emitDeclarationOnly --outDir ./lib --project ./tsconfig-for-declaration.json

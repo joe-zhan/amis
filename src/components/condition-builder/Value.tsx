@@ -92,14 +92,11 @@ export class Value extends React.Component<ValueProps> {
         />
       );
     } else if (field.type === 'select') {
-      const autoComplete = field.autoComplete;
-
       input = (
         <Select
           simpleValue
           options={field.options!}
           source={field.source}
-          autoComplete={autoComplete}
           searchable={field.searchable}
           value={value ?? field.defaultValue ?? ''}
           data={data}

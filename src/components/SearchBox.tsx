@@ -54,7 +54,7 @@ export class SearchBox extends React.Component<SearchBoxProps> {
 
   @autobind
   handleCancel() {
-    const {onActiveChange, onCancel, onChange} = this.props;
+    const {onActiveChange, onChange, onCancel} = this.props;
     onActiveChange?.(false);
     onCancel?.();
     onChange?.('');
@@ -62,14 +62,14 @@ export class SearchBox extends React.Component<SearchBoxProps> {
 
   @autobind
   handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const {searchImediately, onChange} = this.props;
+    const {onChange, onSearch, searchImediately} = this.props;
     onChange?.(e.currentTarget.value);
     searchImediately && this.lazyEmitSearch();
   }
 
   @autobind
   handleSearch() {
-    const {onSearch, value} = this.props;
+    const {value, onSearch} = this.props;
     onSearch?.(value || '');
   }
 
@@ -84,13 +84,14 @@ export class SearchBox extends React.Component<SearchBoxProps> {
   render() {
     const {
       classnames: cx,
+      value,
       active,
       name,
       className,
+      onChange,
       disabled,
       placeholder,
       mini,
-      value,
       translate: __
     } = this.props;
 

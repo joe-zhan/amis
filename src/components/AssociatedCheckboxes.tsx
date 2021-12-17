@@ -5,24 +5,27 @@
  */
 
 import React from 'react';
-import {BaseSelectionProps, BaseSelection} from './Selection';
+import {BaseCheckboxesProps, BaseCheckboxes} from './Checkboxes';
 import {Options, Option} from './Select';
+import ListMenu from './ListMenu';
 import {autobind} from '../utils/helper';
+import ListRadios from './ListRadios';
 import {themeable} from '../theme';
 import {uncontrollable} from 'uncontrollable';
-import GroupedSelection from './GroupedSelection';
-import TableSelection from './TableSelection';
-import TreeSelection from './TreeSelection';
-import GroupedSelecton from './GroupedSelection';
-import ChainedSelection from './ChainedSelection';
+import ListCheckboxes from './ListCheckboxes';
+import TableCheckboxes from './TableCheckboxes';
+import TreeCheckboxes from './TreeCheckboxes';
+import ChainedCheckboxes from './ChainedCheckboxes';
+import Spinner from './Spinner';
+import TreeRadios from './TreeRadios';
 import {Icon} from './icons';
 import {localeable} from '../locale';
 
-export interface AssociatedSelectionProps extends BaseSelectionProps {
+export interface AssociatedCheckboxesProps extends BaseCheckboxesProps {
   leftOptions: Options;
   leftDefaultValue?: any;
-  leftMode?: 'tree' | 'list' | 'group';
-  rightMode?: 'table' | 'list' | 'group' | 'tree' | 'chained';
+  leftMode?: 'tree' | 'list';
+  rightMode?: 'table' | 'list' | 'tree' | 'chained';
   columns?: Array<any>;
   cellRender?: (
     column: {
@@ -36,15 +39,15 @@ export interface AssociatedSelectionProps extends BaseSelectionProps {
   ) => JSX.Element;
 }
 
-export interface AssociatedSelectionState {
+export interface AssociatedCheckboxesState {
   leftValue?: Option;
 }
 
-export class AssociatedSelection extends BaseSelection<
-  AssociatedSelectionProps,
-  AssociatedSelectionState
+export class AssociatedCheckboxes extends BaseCheckboxes<
+  AssociatedCheckboxesProps,
+  AssociatedCheckboxesState
 > {
-  state: AssociatedSelectionState = {
+  state: AssociatedCheckboxesState = {
     leftValue: this.props.leftDefaultValue
   };
 
@@ -53,7 +56,7 @@ export class AssociatedSelection extends BaseSelection<
     const {options, onDeferLoad} = this.props;
 
     if (leftValue) {
-      const selectdOption = BaseSelection.resolveSelected(
+      const selectdOption = ListRadios.resolveSelected(
         leftValue,
         options,
         (option: Option) => option.ref
@@ -75,7 +78,7 @@ export class AssociatedSelection extends BaseSelection<
     const {options, onDeferLoad} = this.props;
     this.setState({leftValue: value});
 
-    const selectdOption = BaseSelection.resolveSelected(
+    const selectdOption = ListRadios.resolveSelected(
       value,
       options,
       (option: Option) => option.ref
@@ -104,12 +107,10 @@ export class AssociatedSelection extends BaseSelection<
       value,
       disabled,
       leftMode,
-      cellRender,
-      multiple,
-      onDeferLoad
+      cellRender
     } = this.props;
 
-    const selectdOption = BaseSelection.resolveSelected(
+    const selectdOption = ListRadios.resolveSelected(
       this.state.leftValue,
       options,
       (option: Option) => option.ref
@@ -117,39 +118,36 @@ export class AssociatedSelection extends BaseSelection<
     const __ = this.props.translate;
 
     return (
-      <div className={cx('AssociatedSelection', className)}>
-        <div className={cx('AssociatedSelection-left')}>
+      <div className={cx('AssociatedCheckboxes', className)}>
+        <div className={cx('AssociatedCheckboxes-left')}>
           {leftMode === 'tree' ? (
-            <TreeSelection
+            <TreeRadios
               option2value={this.leftOption2Value}
               options={leftOptions}
               value={this.state.leftValue}
               disabled={disabled}
               onChange={this.handleLeftSelect}
-              multiple={false}
-              clearable={false}
-              onDeferLoad={onDeferLoad}
+              showRadio={false}
             />
           ) : (
-            <GroupedSelecton
+            <ListRadios
               option2value={this.leftOption2Value}
               options={leftOptions}
               value={this.state.leftValue}
               disabled={disabled}
               onChange={this.handleLeftSelect}
-              multiple={false}
-              clearable={false}
+              showRadio={false}
             />
           )}
         </div>
-        <div className={cx('AssociatedSelection-right')}>
+        <div className={cx('AssociatedCheckboxes-right')}>
           {this.state.leftValue ? (
             selectdOption ? (
               selectdOption.defer && !selectdOption.loaded ? (
-                <div className={cx('AssociatedSelection-box')}>
+                <div className={cx('AssociatedCheckboxes-box')}>
                   <div
                     className={cx(
-                      'AssociatedSelection-reload',
+                      'AssociatedCheckboxes-reload',
                       selectdOption.loading ? 'is-spin' : 'is-clickable'
                     )}
                     onClick={
@@ -168,7 +166,7 @@ export class AssociatedSelection extends BaseSelection<
                   )}
                 </div>
               ) : rightMode === 'table' ? (
-                <TableSelection
+                <TableCheckboxes
                   columns={columns!}
                   value={value}
                   disabled={disabled}
@@ -176,43 +174,39 @@ export class AssociatedSelection extends BaseSelection<
                   onChange={onChange}
                   option2value={option2value}
                   cellRender={cellRender}
-                  multiple={multiple}
                 />
               ) : rightMode === 'tree' ? (
-                <TreeSelection
+                <TreeCheckboxes
                   value={value}
                   disabled={disabled}
                   options={selectdOption.children || []}
                   onChange={onChange}
                   option2value={option2value}
-                  multiple={multiple}
                 />
               ) : rightMode === 'chained' ? (
-                <ChainedSelection
+                <ChainedCheckboxes
                   value={value}
                   disabled={disabled}
                   options={selectdOption.children || []}
                   onChange={onChange}
                   option2value={option2value}
-                  multiple={multiple}
                 />
               ) : (
-                <GroupedSelection
+                <ListCheckboxes
                   value={value}
                   disabled={disabled}
                   options={selectdOption.children || []}
                   onChange={onChange}
                   option2value={option2value}
-                  multiple={multiple}
                 />
               )
             ) : (
-              <div className={cx('AssociatedSelection-box')}>
+              <div className={cx('AssociatedCheckboxes-box')}>
                 {__('Transfer.configError')}
               </div>
             )
           ) : (
-            <div className={cx('AssociatedSelection-box')}>
+            <div className={cx('AssociatedCheckboxes-box')}>
               {__('Transfer.selectFromLeft')}
             </div>
           )}
@@ -224,7 +218,7 @@ export class AssociatedSelection extends BaseSelection<
 
 export default themeable(
   localeable(
-    uncontrollable(AssociatedSelection, {
+    uncontrollable(AssociatedCheckboxes, {
       value: 'onChange'
     })
   )

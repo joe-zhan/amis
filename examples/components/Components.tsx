@@ -108,14 +108,6 @@ export const components = [
           import('../../docs/zh-CN/components/wrapper.md').then(
             makeMarkdownRenderer
           )
-      },
-      {
-        label: 'Portlet 门户栏目',
-        path: '/zh-CN/components/portlet',
-        getComponent: () =>
-          import('../../docs/zh-CN/components/portlet.md').then(
-            makeMarkdownRenderer
-          )
       }
     ]
   },
@@ -243,7 +235,7 @@ export const components = [
           )
       },
       {
-        label: 'ButtonToolbar 按钮工具栏',
+        label: 'Button-Toolbar 按钮工具栏',
         path: '/zh-CN/components/form/button-toolbar',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/button-toolbar.md').then(
@@ -251,7 +243,7 @@ export const components = [
           )
       },
       {
-        label: 'ButtonGroupSelect 按钮点选',
+        label: 'Button-Group-Select 按钮点选',
         path: '/zh-CN/components/form/button-group-select',
         getComponent: () =>
           import(
@@ -259,7 +251,7 @@ export const components = [
           ).then(makeMarkdownRenderer)
       },
       {
-        label: 'ChainedSelect 链式下拉框',
+        label: 'Chain-Select 链式下拉框',
         path: '/zh-CN/components/form/chain-select',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/chain-select.md').then(
@@ -307,7 +299,7 @@ export const components = [
           )
       },
       {
-        label: 'ConditionBuilder 条件组合',
+        label: 'Condition-Builder 条件组合',
         path: '/zh-CN/components/form/condition-builder',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/condition-builder.md').then(
@@ -359,14 +351,6 @@ export const components = [
         path: '/zh-CN/components/form/input-month-range',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/input-month-range.md').then(
-            makeMarkdownRenderer
-          )
-      },
-      {
-        label: 'InputKV 键值对',
-        path: '/zh-CN/components/form/input-kv',
-        getComponent: () =>
-          import('../../docs/zh-CN/components/form/input-kv.md').then(
             makeMarkdownRenderer
           )
       },
@@ -443,7 +427,7 @@ export const components = [
           )
       },
       {
-        label: 'InputGroup 输入框组合',
+        label: 'Input-Group 输入框组合',
         path: '/zh-CN/components/form/input-group',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/input-group.md').then(
@@ -563,7 +547,7 @@ export const components = [
           )
       },
       {
-        label: 'InputRichText 富文本编辑器',
+        label: 'InpuRichText 富文本编辑器',
         path: '/zh-CN/components/form/input-rich-text',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/input-rich-text.md').then(
@@ -659,28 +643,12 @@ export const components = [
           )
       },
       {
-        label: 'TransferPicker 穿梭选择器',
-        path: '/zh-CN/components/form/transfer-picker',
-        getComponent: () =>
-          import('../../docs/zh-CN/components/form/transfer-picker.md').then(
-            makeMarkdownRenderer
-          )
-      },
-      {
         label: 'TabsTransfer 组合穿梭器',
         path: '/zh-CN/components/form/tabs-transfer',
         getComponent: () =>
           import('../../docs/zh-CN/components/form/tabs-transfer.md').then(
             makeMarkdownRenderer
           )
-      },
-      {
-        label: 'TabsTransferPicker 组合穿梭选择器',
-        path: '/zh-CN/components/form/tabs-transfer-picker',
-        getComponent: () =>
-          import(
-            '../../docs/zh-CN/components/form/tabs-transfer-picker.md'
-          ).then(makeMarkdownRenderer)
       },
       {
         label: 'InputTree 树形选择框',
@@ -851,14 +819,6 @@ export const components = [
         path: '/zh-CN/components/images',
         getComponent: () =>
           import('../../docs/zh-CN/components/images.md').then(
-            makeMarkdownRenderer
-          )
-      },
-      {
-        label: 'GridNav 宫格导航',
-        path: '/zh-CN/components/grid-nav',
-        getComponent: () =>
-          import('../../docs/zh-CN/components/grid-nav.md').then(
             makeMarkdownRenderer
           )
       },
@@ -1095,10 +1055,8 @@ export default class Components extends React.PureComponent<any> {
     this.props.setNavigations(components);
   }
 
-  componentDidUpdate(preProps: any) {
-    if (this.props.location.pathname !== preProps.location.pathname) {
-      this.props.setNavigations(components, false);
-    }
+  componentDidUpdate() {
+    this.props.setNavigations(components);
   }
 
   render() {

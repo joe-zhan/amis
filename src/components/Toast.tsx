@@ -51,13 +51,11 @@ interface ToastComponentProps extends ThemeProps, LocaleProps {
   closeButton: boolean;
   showIcon?: boolean;
   timeout: number;
-  errorTimeout: number;
   className?: string;
 }
 
 interface Item extends Config {
-  title?: string | React.ReactNode;
-  body: string | React.ReactNode;
+  body: string;
   level: 'info' | 'success' | 'error' | 'warning';
   id: string;
   onDissmiss?: () => void;
@@ -80,12 +78,11 @@ export class ToastComponent extends React.Component<
 > {
   static defaultProps: Pick<
     ToastComponentProps,
-    'position' | 'closeButton' | 'timeout' | 'errorTimeout'
+    'position' | 'closeButton' | 'timeout'
   > = {
     position: 'top-center',
     closeButton: false,
-    timeout: 4000,
-    errorTimeout: 6000 // 错误的时候 time 调长
+    timeout: 5000
   };
   static themeKey = 'toast';
 
@@ -158,17 +155,18 @@ export class ToastComponent extends React.Component<
       classnames: cx,
       className,
       timeout,
-      errorTimeout,
       position,
       showIcon,
       translate,
       closeButton
     } = this.props;
     const items = this.state.items;
+
     const groupedItems = groupBy(items, item => item.position || position);
 
     return Object.keys(groupedItems).map(position => {
       const toasts = groupedItems[position];
+
       return (
         <div
           key={position}
@@ -179,25 +177,19 @@ export class ToastComponent extends React.Component<
             className
           )}
         >
-          {toasts.map(item => {
-            const level = item.level || 'info';
-            const toastTimeout =
-              item.timeout ?? (level === 'error' ? errorTimeout : timeout);
-            return (
-              <ToastMessage
-                classnames={cx}
-                key={item.id}
-                title={item.title}
-                body={item.body}
-                level={level}
-                timeout={toastTimeout}
-                closeButton={item.closeButton ?? closeButton}
-                onDismiss={this.handleDismissed.bind(this, items.indexOf(item))}
-                translate={translate}
-                showIcon={showIcon}
-              />
-            );
-          })}
+          {toasts.map(item => (
+            <ToastMessage
+              classnames={cx}
+              key={item.id}
+              body={item.body}
+              level={item.level || 'info'}
+              timeout={item.timeout ?? timeout}
+              closeButton={item.closeButton ?? closeButton}
+              onDismiss={this.handleDismissed.bind(this, items.indexOf(item))}
+              translate={translate}
+              showIcon={showIcon}
+            />
+          ))}
         </div>
       );
     });
@@ -207,8 +199,7 @@ export class ToastComponent extends React.Component<
 export default themeable(localeable(ToastComponent));
 
 interface ToastMessageProps {
-  title?: string | React.ReactNode;
-  body: string | React.ReactNode;
+  body: string;
   level: 'info' | 'success' | 'error' | 'warning';
   timeout: number;
   closeButton?: boolean;
@@ -293,7 +284,6 @@ export class ToastMessage extends React.Component<
       onDismiss,
       classnames: cx,
       closeButton,
-      title,
       body,
       allowHtml,
       level,
@@ -321,40 +311,23 @@ export class ToastMessage extends React.Component<
               {showIcon === false ? null : (
                 <div className={cx('Toast-icon')}>
                   {level === 'success' ? (
-                    <Icon icon="status-success" className="icon" />
+                    <Icon icon="success" className="icon" />
                   ) : level == 'error' ? (
-                    <Icon icon="status-fail" className="icon" />
+                    <Icon icon="fail" className="icon" />
                   ) : level == 'info' ? (
-                    <Icon icon="status-info" className="icon" />
+                    <Icon icon="info-circle" className="icon" />
                   ) : level == 'warning' ? (
-                    <Icon icon="status-warning" className="icon" />
+                    <Icon icon="warning" className="icon" />
                   ) : null}
                 </div>
               )}
-
-              <div className={cx('Toast-content')}>
-                {typeof title === 'string' ? (
-                  <span className={cx(`Toast-title`)}>{title}</span>
-                ) : React.isValidElement(title) ? (
-                  React.cloneElement(title, {
-                    className: cx(`Toast-title`, title?.props?.className ?? '')
-                  })
-                ) : null}
-
-                {typeof body === 'string' ? (
-                  <div className={cx('Toast-body')}>
-                    {allowHtml ? <Html html={body} /> : body}
-                  </div>
-                ) : React.isValidElement(body) ? (
-                  React.cloneElement(body, {
-                    className: cx(`Toast-body`, body?.props?.className ?? '')
-                  })
-                ) : null}
+              <div className={cx('Toast-body')}>
+                {allowHtml ? <Html html={body} /> : body}
               </div>
 
               {closeButton ? (
                 <a onClick={this.close} className={cx(`Toast-close`)}>
-                  <Icon icon="status-close" className="icon" />
+                  <Icon icon="close" className="icon" />
                 </a>
               ) : null}
             </div>

@@ -10,7 +10,7 @@
   white-space: nowrap;
   color: var(--DatePicker-color);
   background: var(--DatePicker-bg);
-  border-radius: var(--LocationPicker-borderRadius);
+  border-radius: var(--DatePicker-borderRadius);
 
   &:not(.is-disabled) {
     cursor: pointer;

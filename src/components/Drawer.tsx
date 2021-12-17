@@ -8,10 +8,9 @@ import React from 'react';
 import Transition, {
   ENTERED,
   ENTERING,
-  EXITING,
-  EXITED
+  EXITING
 } from 'react-transition-group/Transition';
-import Portal from 'react-overlays/Portal';
+import {Portal} from 'react-overlays';
 import {Icon} from './icons';
 import cx from 'classnames';
 import {current, addModal, removeModal} from './ModalManager';
@@ -66,20 +65,6 @@ export class Drawer extends React.Component<DrawerProps, DrawerState> {
 
     document.body.addEventListener('click', this.handleRootClickCapture, true);
     document.body.addEventListener('click', this.handleRootClick);
-  }
-
-  componentDidUpdate(prevProps: DrawerProps) {
-    // jest 里面没有触发 entered 导致后续的逻辑错误，
-    // 所以直接 300 ms 后触发
-    if (
-      typeof jest !== 'undefined' &&
-      prevProps.show !== this.props.show &&
-      this.props.show
-    ) {
-      setTimeout(() => {
-        this.handleEntered();
-      }, 300);
-    }
   }
 
   componentWillUnmount() {
@@ -225,15 +210,13 @@ export class Drawer extends React.Component<DrawerProps, DrawerState> {
                     fadeStyles[status]
                   )}
                 >
-                  {show ? (
-                    <a
-                      onClick={disabled ? undefined : onHide}
-                      className={`${ns}Drawer-close`}
-                    >
-                      <Icon icon="close" className="icon" />
-                    </a>
-                  ) : null}
-                  {status === EXITED ? null : children}
+                  <a
+                    onClick={disabled ? undefined : onHide}
+                    className={`${ns}Drawer-close`}
+                  >
+                    <Icon icon="close" className="icon" />
+                  </a>
+                  {children}
                 </div>
               </div>
             );

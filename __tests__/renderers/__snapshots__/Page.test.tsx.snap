@@ -4,7 +4,6 @@ exports[`Renderer:Page 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -89,10 +88,9 @@ exports[`Renderer:Page classNames 1`] = `
 <div
   className="cxd-Page cxd-Page--withSidebar"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
-    className="cxd-Page-aside cxd-Page-aside--withWidth aside-class-name"
+    className="cxd-Page-aside aside-class-name"
   >
     <div
       className="cxd-TplField cxd-Page-asideTplWrapper"
@@ -798,59 +796,6 @@ exports[`Renderer:Page handleAction actionType=drawer 1`] = `
       </div>
     </div>
   </div>
-  <div
-    class="amis-dialog-widget cxd-Drawer cxd-Drawer--right cxd-Drawer--md cxd-Modal--1th"
-    role="dialog"
-  >
-    <div
-      class="cxd-Drawer-overlay in"
-    />
-    <div
-      class="cxd-Drawer-content in"
-    >
-      <a
-        class="cxd-Drawer-close"
-      >
-        <icon-mock
-          classname="icon icon-close"
-          icon="close"
-        />
-      </a>
-      <div
-        class="cxd-Drawer-header"
-      />
-      <div
-        class="cxd-Drawer-body"
-      >
-        <div
-          class="cxd-Spinner-overlay in"
-        />
-        <div
-          class="cxd-Spinner in cxd-Spinner--overlay cxd-Spinner--lg"
-        />
-      </div>
-      <div
-        class="cxd-Drawer-footer"
-      >
-        <button
-          class="cxd-Button cxd-Button--default"
-          type="button"
-        >
-          <span>
-            取消
-          </span>
-        </button>
-        <button
-          class="cxd-Button cxd-Button--primary"
-          type="button"
-        >
-          <span>
-            确认
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 `;
 
@@ -923,92 +868,6 @@ exports[`Renderer:Page handleAction actionType=drawer mergeData 1`] = `
       </div>
     </div>
   </div>
-  <div
-    class="amis-dialog-widget cxd-Drawer cxd-Drawer--right cxd-Drawer--md cxd-Modal--1th"
-    role="dialog"
-  >
-    <div
-      class="cxd-Drawer-overlay in"
-    />
-    <div
-      class="cxd-Drawer-content in"
-    >
-      <a
-        class="cxd-Drawer-close"
-      >
-        <icon-mock
-          classname="icon icon-close"
-          icon="close"
-        />
-      </a>
-      <div
-        class="cxd-Drawer-header"
-      />
-      <div
-        class="cxd-Drawer-body"
-      >
-        <form
-          class="cxd-Form cxd-Form--horizontal"
-          novalidate=""
-        >
-          <input
-            style="display: none;"
-            type="submit"
-          />
-          <div
-            class="cxd-Form-item cxd-Form-item--horizontal"
-            data-role="form-item"
-          >
-            <label
-              class="cxd-Form-label cxd-Form-itemColumn--normal"
-            >
-              <span>
-                <span
-                  class="cxd-TplField"
-                >
-                  <span>
-                    A
-                  </span>
-                </span>
-              </span>
-            </label>
-            <div
-              class="cxd-Form-value"
-            >
-              <div
-                class="cxd-Form-control cxd-TextControl"
-              >
-                <div
-                  class="cxd-TextControl-input"
-                >
-                  <input
-                    autocomplete="off"
-                    name="a"
-                    placeholder=""
-                    size="10"
-                    type="text"
-                    value="3"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div
-        class="cxd-Drawer-footer"
-      >
-        <button
-          class="cxd-Button cxd-Button--default"
-          type="submit"
-        >
-          <span>
-            确认
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 `;
 
@@ -1056,7 +915,6 @@ exports[`Renderer:Page initApi 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -1090,7 +948,6 @@ exports[`Renderer:Page initApi error show Message 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -1110,15 +967,6 @@ exports[`Renderer:Page initApi error show Message 1`] = `
         <div
           className="cxd-Alert cxd-Alert--danger"
         >
-          <div
-            className="cxd-Alert-content"
-          >
-            <div
-              className="cxd-Alert-desc"
-            >
-              Internal Error
-            </div>
-          </div>
           <button
             className="cxd-Alert-close"
             onClick={[Function]}
@@ -1129,6 +977,7 @@ exports[`Renderer:Page initApi error show Message 1`] = `
               icon="close"
             />
           </button>
+          Internal Error
         </div>
       </div>
     </div>
@@ -1140,7 +989,6 @@ exports[`Renderer:Page initApi reFetch when condition changes 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -1174,7 +1022,6 @@ exports[`Renderer:Page initApi reFetch when condition changes 2`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -1592,92 +1439,6 @@ exports[`Renderer:Page initApi reload by Drawer action 2`] = `
             </span>
           </span>
         </div>
-      </div>
-    </div>
-  </div>
-  <div
-    class="amis-dialog-widget cxd-Drawer cxd-Drawer--right cxd-Drawer--md cxd-Modal--1th"
-    role="dialog"
-  >
-    <div
-      class="cxd-Drawer-overlay in"
-    />
-    <div
-      class="cxd-Drawer-content in"
-    >
-      <a
-        class="cxd-Drawer-close"
-      >
-        <icon-mock
-          classname="icon icon-close"
-          icon="close"
-        />
-      </a>
-      <div
-        class="cxd-Drawer-header"
-      />
-      <div
-        class="cxd-Drawer-body"
-      >
-        <form
-          class="cxd-Form cxd-Form--horizontal"
-          novalidate=""
-        >
-          <input
-            style="display: none;"
-            type="submit"
-          />
-          <div
-            class="cxd-Form-item cxd-Form-item--horizontal"
-            data-role="form-item"
-          >
-            <label
-              class="cxd-Form-label cxd-Form-itemColumn--normal"
-            >
-              <span />
-            </label>
-            <div
-              class="cxd-Form-value"
-            >
-              <div
-                class="cxd-Form-control cxd-TextControl"
-              >
-                <div
-                  class="cxd-TextControl-input"
-                >
-                  <input
-                    autocomplete="off"
-                    name="a"
-                    placeholder=""
-                    size="10"
-                    type="text"
-                    value="1"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div
-        class="cxd-Drawer-footer"
-      >
-        <button
-          class="cxd-Button cxd-Button--default"
-          type="button"
-        >
-          <span>
-            取消
-          </span>
-        </button>
-        <button
-          class="cxd-Button cxd-Button--primary"
-          type="button"
-        >
-          <span>
-            确认
-          </span>
-        </button>
       </div>
     </div>
   </div>
@@ -2120,7 +1881,6 @@ exports[`Renderer:Page initApi show loading 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2154,7 +1914,6 @@ exports[`Renderer:Page initApi show loading 2`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2188,7 +1947,6 @@ exports[`Renderer:Page initApi silentPolling 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2222,7 +1980,6 @@ exports[`Renderer:Page initApi silentPolling 2`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2256,7 +2013,6 @@ exports[`Renderer:Page initApi silentPolling 3`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2284,7 +2040,6 @@ exports[`Renderer:Page initApi silentPolling 4`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2312,7 +2067,6 @@ exports[`Renderer:Page initData 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2340,7 +2094,6 @@ exports[`Renderer:Page initFetchOn trigger initApi fetch when condition becomes 
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2374,7 +2127,6 @@ exports[`Renderer:Page location query 1`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"
@@ -2402,7 +2154,6 @@ exports[`Renderer:Page location query 2`] = `
 <div
   className="cxd-Page"
   onClick={[Function]}
-  style={Object {}}
 >
   <div
     className="cxd-Page-content"

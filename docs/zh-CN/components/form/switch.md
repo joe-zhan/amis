@@ -93,5 +93,6 @@ order: 51
 | option     | `string` |           | 选项说明     |
 | onText     | `string` |           | 开启时的文本 |
 | offText    | `string` |           | 关闭时的文本 |
-| trueValue  | `boolean / string / number`    | `true`    | 标识真值     |
-| falseValue | `boolean / string / number`    | `"false"` | 标识假值     |
+| trueValue  | `any`    | `true`    | 标识真值     |
+| falseValue | `any`    | `"false"` | 标识假值     |
+| option     | `string` |           | 选项说明     |

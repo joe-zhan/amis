@@ -14,7 +14,6 @@ export interface SparkLineProps extends ThemeProps, LocaleProps {
         label?: string;
       }
   >;
-  placeholder?: string;
   onClick?: (e: React.MouseEvent, value?: PlainObject) => void;
 }
 
@@ -77,8 +76,6 @@ export class SparkLine extends React.Component<SparkLineProps> {
       value,
       width,
       height,
-      placeholder,
-      translate: __,
       onClick
     } = this.props;
 
@@ -101,7 +98,7 @@ export class SparkLine extends React.Component<SparkLineProps> {
             {this.renderLines()}
           </svg>
         ) : (
-          placeholder ?? __('placeholder.empty')
+          <span>Invalid Value</span>
         )}
       </div>
     );

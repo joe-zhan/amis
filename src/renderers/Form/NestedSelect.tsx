@@ -2,6 +2,7 @@ import React from 'react';
 import Overlay from '../../components/Overlay';
 import Checkbox from '../../components/Checkbox';
 import PopOver from '../../components/PopOver';
+import {RootCloseWrapper} from 'react-overlays';
 import {Icon} from '../../components/icons';
 import {
   autobind,
@@ -23,7 +24,6 @@ import {ResultBox, Spinner} from '../../components';
 import xor from 'lodash/xor';
 import union from 'lodash/union';
 import compact from 'lodash/compact';
-import {RootClose} from '../../utils/RootClose';
 
 /**
  * Nested Select
@@ -582,28 +582,24 @@ export default class NestedSelectControl extends React.Component<
     }
 
     let body = (
-      <RootClose disabled={!this.state.isOpened} onRootClose={this.close}>
-        {(ref: any) => {
-          return (
-            <div className={cx('NestedSelect-menuOuter')} ref={ref}>
-              {options.length ? (
-                this.renderOptions()
-              ) : (
-                <div className={cx('NestedSelect-noResult')}>
-                  {noResultsText}
-                </div>
-              )}
-            </div>
-          );
-        }}
-      </RootClose>
+      <RootCloseWrapper
+        disabled={!this.state.isOpened}
+        onRootClose={this.close}
+      >
+        <div className={cx('NestedSelect-menuOuter')}>
+          {options.length ? (
+            this.renderOptions()
+          ) : (
+            <div className={cx('NestedSelect-noResult')}>{noResultsText}</div>
+          )}
+        </div>
+      </RootCloseWrapper>
     );
 
     return (
       <Overlay
+        container={popOverContainer || this.getTarget}
         target={this.getTarget}
-        container={popOverContainer || (() => findDOMNode(this))}
-        placement={'auto'}
         show
       >
         <PopOver className={cx('NestedSelect-popover')}>{body}</PopOver>

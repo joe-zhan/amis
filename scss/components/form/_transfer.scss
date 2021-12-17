@@ -24,7 +24,6 @@
       )
       var(--gap-sm);
     flex-direction: row;
-    border-radius: var(--borderRadius) var(--borderRadius) 0 0;
 
     &--light {
       background: transparent;
@@ -44,22 +43,21 @@
     border: var(--Form-input-borderWidth) solid var(--Form-input-borderColor);
     display: flex;
     flex-direction: column;
-    border-radius: var(--borderRadius);
   }
 
-  &-select > &-selection,
-  &-result > &-value {
+  &-select > &-checkboxes,
+  &-result > &-selections {
     flex-grow: 1;
     max-height: 100%;
     overflow: auto;
     position: relative; // 貌似不加 relative 会有 bug。
   }
 
-  &-search + &-selection {
+  &-search + &-checkboxes {
     border-top: 1px solid var(--borderColor);
   }
 
-  &-selection .#{$ns}ListSelection-placeholder {
+  &-checkboxes .#{$ns}ListCheckboxes-placeholder {
     height: 100%;
     display: flex;
     align-items: center;
@@ -105,25 +103,6 @@
       color: var(--text--muted-color);
     }
   }
-}
-
-.#{$ns}TabsTransfer {
-  .#{$ns}Transfer-title {
-    height: 40px;
-  }
-
-  // .#{$ns}Transfer-result {
-  //   flex-grow: unset;
-  // }
-
-  &-placeholder {
-    @include checkboxes-placeholder();
-  }
-
-  &-tab {
-    padding: 0;
-    overflow: auto;
-  }
 
   &-tabs {
     display: flex;
@@ -160,19 +139,18 @@
 
     > .#{$ns}Tabs-content {
       flex-grow: 1;
-      min-height: 0;
       position: relative;
       padding: 5px 0 0;
 
       > .#{$ns}Tabs-pane {
         position: relative;
-        height: 100%;
+        min-height: 100%;
 
         &.is-active {
           display: flex;
           flex-direction: column;
 
-          > .#{$ns}Transfer-selection {
+          > .#{$ns}Transfer-checkboxes {
             flex-grow: 1;
             max-height: 100%;
             overflow: auto;
@@ -183,62 +161,24 @@
   }
 }
 
+.#{$ns}TabsTransfer {
+  .#{$ns}Transfer-title {
+    height: 40px;
+  }
+
+  // .#{$ns}Transfer-result {
+  //   flex-grow: unset;
+  // }
+
+  &-placeholder {
+    @include checkboxes-placeholder();
+  }
+}
+
 .#{$ns}TransferControl {
   position: relative;
 
   &.is-inline {
     display: inline-block;
-  }
-}
-
-.#{$ns}TransferPicker {
-  &-icon {
-    transition: transform var(--animation-duration) ease-out;
-    margin: 5px 5px 5px auto;
-    display: flex;
-    color: var(--Form-select-caret-iconColor);
-    &:hover {
-      color: var(--Form-select-caret-onHover-iconColor);
-    }
-
-    > svg {
-      width: px2rem(12px);
-      height: px2rem(12px);
-      top: 0;
-    }
-  }
-}
-
-.#{$ns}TransferDropDown {
-  &-icon {
-    transition: transform var(--animation-duration) ease-out;
-    margin: 5px 5px 5px auto;
-    display: flex;
-    color: var(--Form-select-caret-iconColor);
-    &:hover {
-      color: var(--Form-select-caret-onHover-iconColor);
-    }
-
-    > svg {
-      width: px2rem(10px);
-      height: px2rem(10px);
-      top: 0;
-    }
-  }
-
-  &.is-active &-icon {
-    transform: rotate(180deg);
-  }
-}
-.#{$ns}TransferDropDown-content {
-  min-height: px2rem(200px);
-  display: flex;
-  flex-direction: column;
-
-  & > .#{$ns}Transfer-selection {
-    flex-grow: 1;
-    max-height: 100%;
-    overflow: auto;
-    position: relative; // 貌似不加 relative 会有 bug。
   }
 }

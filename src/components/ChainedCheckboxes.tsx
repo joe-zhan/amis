@@ -1,7 +1,7 @@
 /**
  * 级联多选框，支持无限极。从左侧到右侧一层层点选。
  */
-import {BaseSelection, BaseSelectionProps} from './Selection';
+import {BaseCheckboxes, BaseCheckboxesProps} from './Checkboxes';
 import {themeable} from '../theme';
 import React from 'react';
 import {uncontrollable} from 'uncontrollable';
@@ -12,20 +12,20 @@ import times from 'lodash/times';
 import Spinner from './Spinner';
 import {localeable} from '../locale';
 
-export interface ChainedSelectionProps extends BaseSelectionProps {
+export interface ChainedCheckboxesProps extends BaseCheckboxesProps {
   defaultSelectedIndex?: string;
 }
 
-export interface ChainedSelectionState {
+export interface ChainedCheckboxesState {
   selected: Array<string>;
 }
 
-export class ChainedSelection extends BaseSelection<
-  ChainedSelectionProps,
-  ChainedSelectionState
+export class ChainedCheckboxes extends BaseCheckboxes<
+  ChainedCheckboxesProps,
+  ChainedCheckboxesState
 > {
   valueArray: Array<Option>;
-  state: ChainedSelectionState = {
+  state: ChainedCheckboxesState = {
     selected: []
   };
 
@@ -54,46 +54,6 @@ export class ChainedSelection extends BaseSelection<
     );
   }
 
-  renderItem(option: Option, index: number, depth: number, id: string) {
-    const {
-      labelClassName,
-      disabled,
-      classnames: cx,
-      itemClassName,
-      itemRender,
-      multiple
-    } = this.props;
-    const valueArray = this.valueArray;
-
-    return (
-      <div
-        key={index}
-        className={cx(
-          'ChainedSelection-item',
-          itemClassName,
-          option.className,
-          disabled || option.disabled ? 'is-disabled' : '',
-          !!~valueArray.indexOf(option) ? 'is-active' : ''
-        )}
-        onClick={() => this.toggleOption(option)}
-      >
-        <div className={cx('ChainedSelection-itemLabel')}>
-          {itemRender(option)}
-        </div>
-
-        {multiple ? (
-          <Checkbox
-            size="sm"
-            checked={!!~valueArray.indexOf(option)}
-            disabled={disabled || option.disabled}
-            labelClassName={labelClassName}
-            description={option.description}
-          />
-        ) : null}
-      </div>
-    );
-  }
-
   renderOption(option: Option, index: number, depth: number, id: string) {
     const {
       labelClassName,
@@ -109,7 +69,7 @@ export class ChainedSelection extends BaseSelection<
         <div
           key={index}
           className={cx(
-            'ChainedSelection-item',
+            'ChainedCheckboxes-item',
             itemClassName,
             option.className,
             disabled || option.disabled ? 'is-disabled' : '',
@@ -117,7 +77,7 @@ export class ChainedSelection extends BaseSelection<
           )}
           onClick={() => this.selectOption(option, depth, id)}
         >
-          <div className={cx('ChainedSelection-itemLabel')}>
+          <div className={cx('ChainedCheckboxes-itemLabel')}>
             {itemRender(option)}
           </div>
 
@@ -126,7 +86,30 @@ export class ChainedSelection extends BaseSelection<
       );
     }
 
-    return this.renderItem(option, index, depth, id);
+    return (
+      <div
+        key={index}
+        className={cx(
+          'ChainedCheckboxes-item',
+          itemClassName,
+          option.className,
+          disabled || option.disabled ? 'is-disabled' : ''
+        )}
+        onClick={() => this.toggleOption(option)}
+      >
+        <div className={cx('ChainedCheckboxes-itemLabel')}>
+          {itemRender(option)}
+        </div>
+
+        <Checkbox
+          size="sm"
+          checked={!!~valueArray.indexOf(option)}
+          disabled={disabled || option.disabled}
+          labelClassName={labelClassName}
+          description={option.description}
+        />
+      </div>
+    );
   }
 
   render() {
@@ -141,7 +124,7 @@ export class ChainedSelection extends BaseSelection<
       translate: __
     } = this.props;
 
-    this.valueArray = BaseSelection.value2array(value, options, option2value);
+    this.valueArray = BaseCheckboxes.value2array(value, options, option2value);
     let body: Array<React.ReactNode> = [];
 
     if (Array.isArray(options) && options.length) {
@@ -173,9 +156,9 @@ export class ChainedSelection extends BaseSelection<
           let nextIndexes = indexes;
 
           body.push(
-            <div key={depth} className={cx('ChainedSelection-col')}>
+            <div key={depth} className={cx('ChainedCheckboxes-col')}>
               {subTitle ? (
-                <div className={cx('ChainedSelection-subTitle')}>
+                <div className={cx('ChainedCheckboxes-subTitle')}>
                   {subTitle}
                 </div>
               ) : null}
@@ -193,7 +176,7 @@ export class ChainedSelection extends BaseSelection<
                   return this.renderOption(option, index, depth, id);
                 })
               ) : (
-                <div className={cx('ChainedSelection-placeholder')}>
+                <div className={cx('ChainedCheckboxes-placeholder')}>
                   {__(placeholder)}
                 </div>
               )}
@@ -218,11 +201,11 @@ export class ChainedSelection extends BaseSelection<
     }
 
     return (
-      <div className={cx('ChainedSelection', className)}>
+      <div className={cx('ChainedCheckboxes', className)}>
         {body && body.length ? (
           body
         ) : (
-          <div className={cx('ChainedSelection-placeholder')}>
+          <div className={cx('ChainedCheckboxes-placeholder')}>
             {__(placeholder)}
           </div>
         )}
@@ -233,7 +216,7 @@ export class ChainedSelection extends BaseSelection<
 
 export default themeable(
   localeable(
-    uncontrollable(ChainedSelection, {
+    uncontrollable(ChainedCheckboxes, {
       value: 'onChange'
     })
   )

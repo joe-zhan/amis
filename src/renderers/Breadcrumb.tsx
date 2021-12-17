@@ -77,11 +77,7 @@ export class BreadcrumbField extends React.Component<BreadcrumbProps, object> {
 
     const crumbItems = items
       ? items
-      : (resolveVariableAndFilter(
-          source,
-          data,
-          '| raw'
-        ) as Array<BreadcrumbItemSchema>);
+      : (resolveVariable(source, data) as Array<BreadcrumbItemSchema>);
 
     const crumbs = crumbItems
       .map<React.ReactNode>((item, index) => (

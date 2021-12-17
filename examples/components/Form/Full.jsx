@@ -833,22 +833,6 @@ export default {
           type: 'divider'
         },
         {
-          type: 'input-excel',
-          label: 'Excel 解析',
-          name: 'excel'
-        },
-        {
-          type: 'divider'
-        },
-        {
-          type: 'input-kv',
-          label: 'kv 输入',
-          name: 'kv'
-        },
-        {
-          type: 'divider'
-        },
-        {
           type: 'input-image',
           name: 'image',
           label: '图片'
@@ -1001,17 +985,14 @@ export default {
           type: 'input-tree',
           name: 'tree',
           label: '树',
-          iconField: 'icon',
           options: [
             {
               label: 'Folder A',
               value: 1,
-              icon: 'fa fa-bookmark',
               children: [
                 {
                   label: 'file A',
-                  value: 2,
-                  icon: 'fa fa-star'
+                  value: 2
                 },
                 {
                   label: 'file B',

@@ -1,8 +1,6 @@
 import React, {Suspense} from 'react';
-import cx from 'classnames';
-
 import {FormItem, FormControlProps, FormBaseControl} from './Item';
-import type {PresetColor} from '../../components/ColorPicker';
+import cx from 'classnames';
 
 export const ColorPicker = React.lazy(
   () => import('../../components/ColorPicker')
@@ -36,7 +34,7 @@ export interface InputColorControlSchema extends FormBaseControl {
   /**
    * 预设颜色，用户可以直接从预设中选。
    */
-  presetColors?: Array<PresetColor>;
+  presetColors?: Array<any>;
 
   /**
    * 是否允许用户输入颜色。

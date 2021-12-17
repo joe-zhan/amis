@@ -8,7 +8,6 @@ import {observer} from 'mobx-react';
 import {trace, reaction} from 'mobx';
 import {createObject, flattenTree} from '../../utils/helper';
 import {LocaleProps} from '../../locale';
-import {ActionSchema} from '../Action';
 
 export interface TableBodyProps extends LocaleProps {
   className?: string;
@@ -24,7 +23,7 @@ export interface TableBodyProps extends LocaleProps {
     item: IRow,
     props: any
   ) => React.ReactNode;
-  onCheck: (item: IRow, value: boolean, shift?: boolean) => void;
+  onCheck: (item: IRow) => void;
   onQuickChange?: (
     item: IRow,
     values: object,
@@ -42,10 +41,8 @@ export interface TableBodyProps extends LocaleProps {
   data?: any;
   prefixRow?: Array<any>;
   affixRow?: Array<any>;
-  itemAction?: ActionSchema;
 }
 
-@observer
 export class TableBody extends React.Component<TableBodyProps> {
   renderRows(
     rows: Array<any>,
@@ -65,8 +62,7 @@ export class TableBody extends React.Component<TableBodyProps> {
       onQuickChange,
       footable,
       ignoreFootableContent,
-      footableColumns,
-      itemAction
+      footableColumns
     } = this.props;
 
     return rows.map((item: IRow, rowIndex: number) => {
@@ -75,7 +71,6 @@ export class TableBody extends React.Component<TableBodyProps> {
       const doms = [
         <TableRow
           {...itemProps}
-          itemAction={itemAction}
           classnames={cx}
           checkOnItemClick={checkOnItemClick}
           key={item.id}
@@ -105,7 +100,6 @@ export class TableBody extends React.Component<TableBodyProps> {
           doms.push(
             <TableRow
               {...itemProps}
-              itemAction={itemAction}
               classnames={cx}
               checkOnItemClick={checkOnItemClick}
               key={`foot-${item.id}`}
@@ -129,7 +123,7 @@ export class TableBody extends React.Component<TableBodyProps> {
             />
           );
         }
-      } else if (item.children.length && item.expanded) {
+      } else if (item.children.length) {
         // 嵌套表格
         doms.push(
           ...this.renderRows(item.children, columns, {
@@ -142,11 +136,7 @@ export class TableBody extends React.Component<TableBodyProps> {
     });
   }
 
-  renderSummaryRow(
-    position: 'prefix' | 'affix',
-    items?: Array<any>,
-    rowIndex?: number
-  ) {
+  renderSummaryRow(items?: Array<any>) {
     const {columns, render, data, classnames: cx, rows} = this.props;
 
     if (!(Array.isArray(items) && items.length)) {
@@ -187,10 +177,7 @@ export class TableBody extends React.Component<TableBodyProps> {
     });
 
     return (
-      <tr
-        className={cx('Table-tr', 'is-summary')}
-        key={`summary-${position}-${rowIndex || 0}`}
-      >
+      <tr className={cx('Table-tr', 'is-summary')}>
         {result.map((item, index) => {
           const Com = item.isHead ? 'th' : 'td';
           return (
@@ -209,17 +196,11 @@ export class TableBody extends React.Component<TableBodyProps> {
     );
   }
 
-  renderSummary(position: 'prefix' | 'affix', items?: Array<any>) {
+  renderSummary(items?: Array<any>) {
     return Array.isArray(items)
       ? items.some(i => Array.isArray(i))
-        ? items.map((i, rowIndex) =>
-            this.renderSummaryRow(
-              position,
-              Array.isArray(i) ? i : [i],
-              rowIndex
-            )
-          )
-        : this.renderSummaryRow(position, items)
+        ? items.map(i => this.renderSummaryRow(Array.isArray(i) ? i : [i]))
+        : this.renderSummaryRow(items)
       : null;
   }
 
@@ -240,9 +221,9 @@ export class TableBody extends React.Component<TableBodyProps> {
       <tbody className={className}>
         {rows.length ? (
           <>
-            {this.renderSummary('prefix', prefixRow)}
+            {this.renderSummary(prefixRow)}
             {this.renderRows(rows, columns, rowsProps)}
-            {this.renderSummary('affix', affixRow)}
+            {this.renderSummary(affixRow)}
           </>
         ) : null}
       </tbody>

@@ -10,11 +10,9 @@
     width: px2rem(120px);
     height: px2rem(120px);
     display: inline-flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     border: var(--borderWidth) solid var(--borderColor);
-    border-radius: var(--ImageControl-addBtn-borderRadius);
     cursor: pointer;
     margin-right: var(--gap-base);
 
@@ -31,10 +29,9 @@
     );
 
     > svg {
-      width: px2rem(24px);
-      height: px2rem(24px);
+      width: px2rem(40px);
+      height: px2rem(40px);
       top: 0;
-      margin-bottom: px2rem(8px);
     }
 
     &.is-disabled {
@@ -74,7 +71,6 @@
 
   &-item {
     border: var(--borderWidth) solid var(--borderColor);
-    border-radius: var(--ImageControl-addBtn-borderRadius);
     vertical-align: top;
     padding: var(--gap-xs);
     display: inline-block;
@@ -133,7 +129,6 @@
 
   &-progressValue {
     height: 5px;
-    border-radius: var(--ImageControl-progress-borderRadius);
     display: block;
     background: var(--info);
     min-width: 10%;

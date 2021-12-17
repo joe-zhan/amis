@@ -7,7 +7,7 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import {ClassNamesFn, themeable} from '../theme';
-import {camel, preventDefault} from '../utils/helper';
+import {camel} from '../utils/helper';
 
 export interface Offset {
   x: number;
@@ -53,21 +53,12 @@ export class PopOver extends React.PureComponent<PopOverPorps, PopOverState> {
   };
 
   parent: HTMLElement;
-  wrapperRef: React.RefObject<HTMLDivElement> = React.createRef();
 
   componentDidMount() {
     this.mayUpdateOffset();
     const dom = findDOMNode(this) as HTMLElement;
     this.parent = dom.parentNode as HTMLElement;
     this.parent.classList.add('has-popover');
-
-    if (this.wrapperRef && this.wrapperRef.current) {
-      // https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener#使用_passive_改善的滚屏性能
-      this.wrapperRef.current.addEventListener('touchmove', preventDefault, {
-        passive: false,
-        capture: false
-      });
-    }
   }
 
   componentDidUpdate() {
@@ -76,10 +67,6 @@ export class PopOver extends React.PureComponent<PopOverPorps, PopOverState> {
 
   componentWillUnmount() {
     this.parent && this.parent.classList.remove('has-popover');
-
-    if (this.wrapperRef && this.wrapperRef.current) {
-      this.wrapperRef.current.removeEventListener('touchmove', preventDefault);
-    }
   }
 
   mayUpdateOffset() {
@@ -135,7 +122,6 @@ export class PopOver extends React.PureComponent<PopOverPorps, PopOverState> {
 
     return (
       <div
-        ref={this.wrapperRef}
         className={cx(
           `${ns}PopOver`,
           className,

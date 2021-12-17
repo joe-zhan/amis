@@ -59,15 +59,15 @@ order: 35
       "valueField": "id",
       "labelField": "engine",
       "label": "多选",
-      "source": "/api/mock2/sample",
+      "source": "/api/sample",
       "size": "lg",
       "value": "4,5",
       "multiple": true,
       "pickerSchema": {
         "mode": "table",
         "name": "thelist",
-        "quickSaveApi": "/api/mock2/sample/bulkUpdate",
-        "quickSaveItemApi": "/api/mock2/sample/$id",
+        "quickSaveApi": "/api/sample/bulkUpdate",
+        "quickSaveItemApi": "/api/sample/$id",
         "draggable": true,
         "headerToolbar": {
           "wrapWithPanel": false,
@@ -203,7 +203,7 @@ order: 35
                   "body": {
                     "type": "form",
                     "name": "sample-edit-form",
-                    "api": "/api/mock2/sample/$id",
+                    "api": "/api/sample/$id",
                     "body": [
                       {
                         "type": "input-text",
@@ -255,7 +255,7 @@ order: 35
                 "icon": "fa fa-times text-danger",
                 "actionType": "ajax",
                 "confirmText": "您确认要删除?",
-                "api": "delete:/api/mock2/sample/$id"
+                "api": "delete:/api/sample/$id"
               }
             ],
             "toggled": true
@@ -284,15 +284,15 @@ order: 35
       "labelField": "engine",
       "label": "Picker",
       "embed": true,
-      "source": "/api/mock2/crud/tree?waitSeconds=1",
+      "source": "/api/sample",
       "size": "lg",
       "value": "4,5",
       "multiple": true,
       "pickerSchema": {
         "mode": "table",
         "name": "thelist",
-        "quickSaveApi": "/api/mock2/sample/bulkUpdate",
-        "quickSaveItemApi": "/api/mock2/sample/$id",
+        "quickSaveApi": "/api/sample/bulkUpdate",
+        "quickSaveItemApi": "/api/sample/$id",
         "draggable": true,
         "headerToolbar": {
           "wrapWithPanel": false,
@@ -428,7 +428,7 @@ order: 35
                   "body": {
                     "type": "form",
                     "name": "sample-edit-form",
-                    "api": "/api/mock2/sample/$id",
+                    "api": "/api/sample/$id",
                     "body": [
                       {
                         "type": "input-text",
@@ -480,7 +480,7 @@ order: 35
                 "icon": "fa fa-times text-danger",
                 "actionType": "ajax",
                 "confirmText": "您确认要删除?",
-                "api": "delete:/api/mock2/sample/$id"
+                "api": "delete:/api/sample/$id"
               }
             ],
             "toggled": true

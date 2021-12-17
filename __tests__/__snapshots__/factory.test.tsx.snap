@@ -38,29 +38,21 @@ exports[`factory unregistered Renderer 1`] = `
   <div
     class="cxd-Alert cxd-Alert--danger"
   >
-    <div
-      class="cxd-Alert-content"
-    >
-      <div
-        class="cxd-Alert-desc"
-      >
-        <p>
-          Error: 找不到对应的渲染器
-        </p>
-        <p>
-          Path: 
-          my-renderer
-        </p>
-        <pre>
-          <code>
-            {
+    <p>
+      Error: 找不到对应的渲染器
+    </p>
+    <p>
+      Path: 
+      my-renderer
+    </p>
+    <pre>
+      <code>
+        {
   "type": "my-renderer",
   "a": 23
 }
-          </code>
-        </pre>
-      </div>
-    </div>
+      </code>
+    </pre>
   </div>
 </div>
 `;
@@ -328,8 +320,8 @@ exports[`factory:definitions 1`] = `
                             data-tooltip="删除"
                           >
                             <icon-mock
-                              classname="icon icon-status-close"
-                              icon="status-close"
+                              classname="icon icon-close"
+                              icon="close"
                             />
                           </a>
                         </div>

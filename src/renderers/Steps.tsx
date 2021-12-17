@@ -1,6 +1,6 @@
 import React from 'react';
 import {Renderer, RendererProps} from '../factory';
-import {BaseSchema, SchemaCollection} from '../Schema';
+import {BaseSchema} from '../Schema';
 import Steps, {StepStatus} from '../components/Steps';
 import {
   RemoteOptionsProps,
@@ -14,12 +14,12 @@ export type StepSchema = {
   /**
    * 标题
    */
-  title: string | SchemaCollection;
+  title: string;
 
   /**
    * 子标题
    */
-  subTitle?: string | SchemaCollection;
+  subTitle?: string;
 
   /**
    * 图标
@@ -31,7 +31,7 @@ export type StepSchema = {
   /**
    * 描述
    */
-  description?: string | SchemaCollection;
+  description?: string;
 } & Omit<BaseSchema, 'type'>;
 
 export interface StepsSchema extends BaseSchema {
@@ -82,8 +82,7 @@ export function StepsCmpt(props: StepsProps) {
     mode,
     data,
     source,
-    config,
-    render
+    config
   } = props;
   
   const stepsRow =
@@ -91,9 +90,7 @@ export function StepsCmpt(props: StepsProps) {
     config ||
     steps ||
     [];
-  const resolveRender = (val?: string | SchemaCollection) => typeof val === 'string'
-    ? filter(val, data)
-    : val && render('inner', val);
+
   const value = getPropValue(props) ?? 0;
   const resolveValue =
     typeof value === 'string' && isNaN(+value)
@@ -108,9 +105,9 @@ export function StepsCmpt(props: StepsProps) {
     return {
       ...step,
       status: stepStatus,
-      title: resolveRender(step.title),
-      subTitle: resolveRender(step.subTitle),
-      description: resolveRender(step.description)
+      title: filter(step.title, data),
+      subTitle: filter(step.subTitle || step.value, data),
+      description: filter(step.description, data)
     }
   });
 

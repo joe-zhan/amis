@@ -3,24 +3,8 @@ import {RendererStore, IRendererStore, IIRendererStore} from './store/index';
 import {getEnv, destroy} from 'mobx-state-tree';
 import {wrapFetcher} from './utils/api';
 import {normalizeLink} from './utils/normalizeLink';
-import {
-  findIndex,
-  isObject,
-  JSONTraverse,
-  promisify,
-  qsparse,
-  string2regExp
-} from './utils/helper';
-import {
-  Api,
-  fetcherResult,
-  Payload,
-  SchemaNode,
-  Schema,
-  Action,
-  EventTrack,
-  PlainObject
-} from './types';
+import {findIndex, promisify, qsparse, string2regExp} from './utils/helper';
+import {Api, fetcherResult, Payload, SchemaNode, Schema, Action} from './types';
 import {observer} from 'mobx-react';
 import Scoped from './Scoped';
 import {getTheme, ThemeInstance, ThemeProps} from './theme';
@@ -32,7 +16,6 @@ import {getDefaultLocale, makeTranslator, LocaleProps} from './locale';
 import ScopedRootRenderer, {RootRenderProps} from './Root';
 import {HocStoreFactory} from './WithStore';
 import {EnvContext, RendererEnv} from './env';
-import {envOverwrite} from './envOverwrite';
 
 export interface TestFunc {
   (
@@ -91,16 +74,11 @@ export interface RenderSchemaFilter {
   (schema: Schema, renderer: RendererConfig, props?: any): Schema;
 }
 
-export interface wsObject {
-  url: string;
-  body?: any;
-}
-
 export interface RenderOptions {
   session?: string;
   fetcher?: (config: fetcherConfig) => Promise<fetcherResult>;
   wsFetcher?: (
-    ws: wsObject,
+    ws: string,
     onMessage: (data: any) => void,
     onError: (error: any) => void
   ) => void;
@@ -121,7 +99,7 @@ export interface RenderOptions {
     schema: Schema,
     props: any
   ) => null | RendererConfig;
-  copy?: (contents: string, options?: any) => void;
+  copy?: (contents: string) => void;
   getModalContainer?: () => HTMLElement;
   loadRenderer?: (
     schema: Schema,
@@ -131,20 +109,12 @@ export interface RenderOptions {
   affixOffsetTop?: number;
   affixOffsetBottom?: number;
   richTextToken?: string;
-  /**
-   * 替换文本，用于实现 URL 替换、语言替换等
-   */
-  replaceText?: {[propName: string]: any};
-  /**
-   * 文本替换的黑名单，因为属性太多了所以改成黑名单的 fangs
-   */
-  replaceTextIgnoreKeys?: String[];
   [propName: string]: any;
 }
 
 export interface fetcherConfig {
   url: string;
-  method?: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'jsonp';
+  method?: 'get' | 'post' | 'put' | 'patch' | 'delete';
   data?: any;
   config?: any;
 }
@@ -254,7 +224,7 @@ export function loadRenderer(schema: Schema, path: string) {
 
 const defaultOptions: RenderOptions = {
   session: 'global',
-  affixOffsetTop: 0,
+  affixOffsetTop: 50,
   affixOffsetBottom: 0,
   richTextToken: '',
   loadRenderer,
@@ -264,13 +234,8 @@ const defaultOptions: RenderOptions = {
   // 使用 WebSocket 来实时获取数据
   wsFetcher(ws, onMessage, onError) {
     if (ws) {
-      const socket = new WebSocket(ws.url);
-      socket.onopen = event => {
-        if (ws.body) {
-          socket.send(JSON.stringify(ws.body));
-        }
-      };
-      socket.onmessage = event => {
+      const socket = new WebSocket(ws);
+      socket.onmessage = (event: any) => {
         if (event.data) {
           onMessage(JSON.parse(event.data));
         }
@@ -287,19 +252,19 @@ const defaultOptions: RenderOptions = {
   },
   isCancel() {
     console.error(
-      'Please implement isCancel. see https://baidu.gitee.io/amis/docs/start/getting-started#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97'
+      'Please implements this. see https://baidu.gitee.io/amis/docs/start/getting-started#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97'
     );
     return false;
   },
   updateLocation() {
     console.error(
-      'Please implement updateLocation. see https://baidu.gitee.io/amis/docs/start/getting-started#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97'
+      'Please implements this. see https://baidu.gitee.io/amis/docs/start/getting-started#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97'
     );
   },
   alert,
   confirm,
   notify: (type, msg, conf) =>
-    toast[type] ? toast[type](msg, conf) : console.warn('[Notify]', type, msg),
+    toast[type] ? toast[type](msg) : console.warn('[Notify]', type, msg),
 
   jumpTo: (to: string, action?: any) => {
     if (to === 'goBack') {
@@ -345,17 +310,7 @@ const defaultOptions: RenderOptions = {
   copy(contents: string) {
     console.error('copy contents', contents);
   },
-  // 用于跟踪用户在界面中的各种操作
-  tracker(eventTrack: EventTrack, props: PlainObject) {},
-  rendererResolver: resolveRenderer,
-  replaceTextIgnoreKeys: [
-    'type',
-    'name',
-    'mode',
-    'target',
-    'reload',
-    'persistData'
-  ]
+  rendererResolver: resolveRenderer
 };
 let stores: {
   [propName: string]: IRendererStore;
@@ -375,15 +330,12 @@ export function render(
   const translate = props.translate || makeTranslator(locale);
   let store = stores[options.session || 'global'];
 
-  // 根据环境覆盖 schema，这个要在最前面做，不然就无法覆盖 validations
-  envOverwrite(schema, locale);
-
   if (!store) {
     options = {
       ...defaultOptions,
       ...options,
       fetcher: options.fetcher
-        ? wrapFetcher(options.fetcher, options.tracker)
+        ? wrapFetcher(options.fetcher)
         : defaultOptions.fetcher,
       confirm: promisify(
         options.confirm || defaultOptions.confirm || window.confirm
@@ -408,25 +360,6 @@ export function render(
   if (props.locale !== undefined) {
     env.translate = translate;
     env.locale = locale;
-  }
-
-  // 进行文本替换
-  if (env.replaceText && isObject(env.replaceText)) {
-    const replaceKeys = Object.keys(env.replaceText);
-    replaceKeys.sort().reverse(); // 避免用户将短的放前面
-    const replaceTextIgnoreKeys = new Set(env.replaceTextIgnoreKeys || []);
-    JSONTraverse(schema, (value: any, key: string, object: any) => {
-      if (typeof value === 'string' && !replaceTextIgnoreKeys.has(key)) {
-        for (const replaceKey of replaceKeys) {
-          if (~value.indexOf(replaceKey)) {
-            object[key] = value.replaceAll(
-              replaceKey,
-              env.replaceText[replaceKey]
-            );
-          }
-        }
-      }
-    });
   }
 
   return (
@@ -473,7 +406,7 @@ export function updateEnv(options: Partial<RenderOptions>, session = 'global') {
   };
 
   if (options.fetcher) {
-    options.fetcher = wrapFetcher(options.fetcher, options.tracker) as any;
+    options.fetcher = wrapFetcher(options.fetcher) as any;
   }
 
   if (options.confirm) {

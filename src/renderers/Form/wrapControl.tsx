@@ -129,8 +129,7 @@ export function wrapControl<
                 clearValueOnHidden,
                 validateApi,
                 minLength,
-                maxLength,
-                validateOnChange
+                maxLength
               }
             } = this.props;
 
@@ -175,8 +174,7 @@ export function wrapControl<
               clearValueOnHidden,
               validateApi,
               minLength,
-              maxLength,
-              validateOnChange
+              maxLength
             });
 
             // issue 这个逻辑应该在 combo 里面自己实现。
@@ -467,7 +465,6 @@ export function wrapControl<
             }
 
             this.model.changeTmpValue(value);
-
             if (changeImmediately || conrolChangeImmediately || !formInited) {
               this.emitChange(submitOnChange);
             } else {
@@ -482,17 +479,8 @@ export function wrapControl<
             const {
               formStore: form,
               onChange,
-              $schema: {
-                name,
-                id,
-                label,
-                type,
-                onChange: onFormItemChange,
-                maxLength,
-                minLength
-              },
+              $schema: {name, onChange: onFormItemChange, maxLength, minLength},
               data,
-              env,
               validateOnChange,
               formSubmited
             } = this.props;
@@ -507,22 +495,6 @@ export function wrapControl<
               return;
             }
 
-            if (type !== 'input-password') {
-              env?.tracker(
-                {
-                  eventType: 'formItemChange',
-                  eventData: {
-                    id,
-                    name,
-                    label,
-                    type,
-                    value
-                  }
-                },
-                this.props
-              );
-            }
-
             this.model.changeEmitedValue(value);
             if (
               onFormItemChange?.(value, oldValue, this.model, form) === false
@@ -534,8 +506,8 @@ export function wrapControl<
 
             if (
               // 如果配置了 minLength 或者 maxLength 就切成及时验证
-              this.model.rules.minLength ||
-              this.model.rules.maxLength ||
+              // (typeof maxLength && maxLength) ||
+              // (typeof minLength && minLength) ||
               validateOnChange === true ||
               (validateOnChange !== false && (formSubmited || validated))
             ) {

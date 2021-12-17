@@ -92,9 +92,7 @@ export class StatusField extends React.Component<StatusProps, object> {
     } = this.props;
     let value = getPropValue(this.props);
     let viewValue: React.ReactNode = (
-      <span className="text-muted" key="status-value">
-        {placeholder}
-      </span>
+      <span className="text-muted">{placeholder}</span>
     );
     let wrapClassName: string = '';
 

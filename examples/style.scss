@@ -290,13 +290,13 @@ body {
 
     &:hover,
     &.is-active {
-      color: var(--primary);
+      color: #108cee;
       position: relative;
       text-decoration: none;
 
       &::before {
         content: '';
-        border-bottom: 2px solid var(--primary);
+        border-bottom: 2px solid #108cee;
         position: absolute;
         width: 100%;
         left: 0;
@@ -440,11 +440,11 @@ body {
 
         &.is-active {
           > a {
-            color: var(--primary);
+            color: #108cee;
             background: transparent;
 
             &:hover {
-              color: var(--primary);
+              color: #108cee;
               background: transparent;
             }
           }
@@ -496,14 +496,14 @@ body {
       &.is-active {
         &::before {
           content: ' ';
-          border-left: px2rem(2px) solid var(--primary);
+          border-left: px2rem(2px) solid #108cee;
           position: absolute;
           left: 0;
           height: px2rem(20px);
           transform: translateY(px2rem(4px));
         }
         > a {
-          color: var(--primary);
+          color: #108cee;
         }
       }
     }
@@ -536,7 +536,7 @@ body {
         }
         &:hover {
           font-weight: 700;
-          color: var(--primary);
+          color: #108cee;
         }
       }
     }
@@ -578,7 +578,7 @@ body {
       text-align: right;
 
       > a {
-        color: var(--primary);
+        color: #108cee;
         font-weight: 600;
       }
     }
@@ -602,11 +602,11 @@ body {
         text-decoration: none;
 
         &:hover {
-          border-color: var(--primary);
-          color: var(--primary);
+          border-color: #108cee;
+          color: #108cee;
 
           .Doc-navLinks-title {
-            color: var(--primary);
+            color: #108cee;
           }
         }
 
@@ -714,7 +714,7 @@ body {
 
     &.is-active > a,
     &.is-active.is-top > a {
-      color: var(--primary);
+      color: #108cee;
     }
   }
 }
@@ -747,7 +747,7 @@ body {
   .Backtop {
     color: #666;
     &:hover {
-      color: var(--primary);
+      color: #108cee;
     }
   }
 
@@ -781,7 +781,7 @@ body {
   background: #fff;
 
   &:hover {
-    color: var(--primary);
+    color: #108cee;
   }
 
   &.visible {
@@ -840,7 +840,6 @@ body {
       top: 100px;
       bottom: 0;
       overflow-y: auto;
-      overflow-x: hidden;
       border-right: 1px solid #e8ebee;
     }
   }
@@ -979,7 +978,7 @@ body {
 
       &::before {
         content: ' ';
-        border-left: 2px solid var(--primary);
+        border-left: 2px solid #108cee;
         margin-right: 10px;
       }
     }
@@ -1029,7 +1028,6 @@ body.dark {
 .Playgroud {
   border: 1px solid #ddd;
   background: var(--body-bg);
-  display: flex;
 
   body.dark & {
     background: #191c22;
@@ -1037,11 +1035,11 @@ body.dark {
   }
 
   &-preview {
+    border-bottom: 1px solid #ddd;
     position: relative;
     display: flex;
     align-items: stretch;
     flex-direction: column;
-    flex-grow: 1;
 
     > div {
       flex: 1;
@@ -1049,20 +1047,7 @@ body.dark {
   }
 
   &-code {
-    border-left: 1px solid #ddd;
-    width: 350px;
     flex-shrink: 0;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .Playgroud {
-    flex-direction: column;
-
-    &-code {
-      border-left: none;
-      width: auto;
-      height: 200px;
-    }
+    height: 200px;
   }
 }

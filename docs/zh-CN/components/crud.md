@@ -19,7 +19,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
 ```schema: scope="body"
 {
     "type": "crud",
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "syncLocation": false,
     "columns": [
         {
@@ -116,7 +116,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
             "title": "新增表单",
             "body": {
                 "type": "form",
-                "api": "post:/api/mock2/sample",
+                "api": "post:/api/sample",
                 "body": [
                     {
                         "type": "input-text",
@@ -134,7 +134,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
     },
     {
         "type": "crud",
-        "api": "/api/mock2/sample?orderBy=id&orderDir=desc",
+        "api": "/api/sample?orderBy=id&orderDir=desc",
         "syncLocation": false,
         "columns": [
             {
@@ -175,7 +175,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
 ```schema: scope="body"
 {
     "type": "crud",
-    "api": "/api/mock2/sample?orderBy=id&orderDir=desc",
+    "api": "/api/sample?orderBy=id&orderDir=desc",
     "syncLocation": false,
     "columns": [
         {
@@ -200,7 +200,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
                     "actionType": "ajax",
                     "level": "danger",
                     "confirmText": "确认要删除？",
-                    "api": "delete:/api/mock2/sample/${id}"
+                    "api": "delete:/api/sample/${id}"
                 }
             ]
         }
@@ -215,7 +215,7 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
 ```schema: scope="body"
 {
     "type": "crud",
-    "api": "/api/mock2/sample?orderBy=id&orderDir=desc",
+    "api": "/api/sample?orderBy=id&orderDir=desc",
     "syncLocation": false,
     "columns": [
         {
@@ -242,8 +242,8 @@ CRUD，即增删改查组件，主要用来展现数据列表，并支持各类�
                         "title": "新增表单",
                         "body": {
                             "type": "form",
-                            "initApi": "/api/mock2/sample/${id}",
-                            "api": "post:/api/mock2/sample/${id}",
+                            "initApi": "/api/sample/${id}",
+                            "api": "post:/api/sample/${id}",
                             "body": [
                                 {
                                     "type": "input-text",
@@ -282,7 +282,7 @@ Table 模式支持 [Table](./table) 中的所有功能。
 ```schema: scope="body"
 {
     "type": "crud",
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "syncLocation": false,
     "columns": [
         {
@@ -318,7 +318,7 @@ List 模式支持 [List](./list) 中的所有功能。
 ```schema: scope="body"
 {
 "type": "crud",
-"api": "/api/mock2/crud/permissions",
+"api": "raw:/api/mock2/crud/permissions",
 "mode": "list",
 "placeholder": "当前组内, 还没有配置任何权限.",
 "syncLocation": false,
@@ -475,7 +475,7 @@ Cards 模式支持 [Cards](./cards) 中的所有功能。
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
      "filter": {
         "title": "条件搜索",
         "body": [
@@ -519,78 +519,6 @@ Cards 模式支持 [Cards](./cards) 中的所有功能。
 
 如果想前端实现过滤功能，请看[前端一次性加载](#前端一次性加载)部分。
 
-### 自动生成查询区域
-
-通过设置`"autoGenerateFilter": true`开启查询区域，会根据列元素的 `searchable` 属性值，自动生成查询条件表单，只有 `searchable` 属性值为合法的组件 Schema 时才会生成查询条件。注意这个属性和 `filter` 冲突，开启 `filter` 后 `autoGenerateFilter` 将会失效。
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "api": "/api/mock2/sample",
-    "syncLocation": false,
-    "autoGenerateFilter": true,
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID",
-            "searchable": {
-              "type": "input-text",
-              "name": "id",
-              "label": "主键",
-              "placeholder": "输入id"
-            }
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser",
-            "searchable": {
-              "type": "select",
-              "name": "browser",
-              "label": "浏览器",
-              "placeholder": "选择浏览器",
-              "options": [
-                {
-                  "label": "Internet Explorer ",
-                  "value": "ie"
-                },
-                {
-                  "label": "AOL browser",
-                  "value": "aol"
-                },
-                {
-                  "label": "Firefox",
-                  "value": "firefox"
-                }
-              ]
-            }
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version",
-            "searchable": {
-              "type": "input-number",
-              "name": "version",
-              "label": "版本号",
-              "placeholder": "输入版本号",
-              "mode": "horizontal"
-            }
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
 ## 配置默认请求参数
 
 可以配置`defaultParams`，来指定拉取接口时的默认参数：
@@ -599,7 +527,7 @@ Cards 模式支持 [Cards](./cards) 中的所有功能。
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "defaultParams": {
         "perPage": 50
     },
@@ -642,7 +570,7 @@ Cards 模式支持 [Cards](./cards) 中的所有功能。
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "interval": 3000,
     "columns": [
         {
@@ -687,7 +615,7 @@ Cards 模式支持 [Cards](./cards) 中的所有功能。
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "columns": [
         {
             "name": "id",
@@ -721,7 +649,7 @@ amis 只负责生成排序组件，并将排序参数传递给接口，而不会
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "columns": [
         {
             "name": "id",
@@ -754,7 +682,7 @@ amis 只负责生成搜索组件，并将搜索参数传递给接口，而不会
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "columns": [
         {
             "name": "id",
@@ -797,8 +725,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveApi": "/api/mock2/sample/bulkUpdate",
+    "api": "/api/sample",
+    "quickSaveApi": "/api/sample/bulkUpdate",
     "columns": [
         {
             "name": "id",
@@ -821,8 +749,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveApi": "/api/mock2/sample/bulkUpdate",
+    "api": "/api/sample",
+    "quickSaveApi": "/api/sample/bulkUpdate",
     "columns": [
         {
             "name": "id",
@@ -852,8 +780,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveApi": "/api/mock2/sample/bulkUpdate",
+    "api": "/api/sample",
+    "quickSaveApi": "/api/sample/bulkUpdate",
     "columns": [
         {
             "name": "id",
@@ -896,8 +824,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveApi": "/api/mock2/sample/bulkUpdate",
+    "api": "/api/sample",
+    "quickSaveApi": "/api/sample/bulkUpdate",
     "columns": [
         {
             "name": "id",
@@ -918,16 +846,6 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
                     "X"
                 ]
             }
-        },
-        {
-            "name": "switch",
-            "label": "switch",
-            "quickEdit": {
-                "mode": "inline",
-                "type": "switch",
-                "onText": "开启",
-                "offText": "关闭"
-            }
         }
     ]
 }
@@ -935,14 +853,14 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 
 #### 即时保存
 
-如果想编辑完表单项之后，不想点击顶部确认按钮来进行保存，而是即时保存当前标记的数据，则需要配置 `quickEdit` 中的 `"saveImmediately": true`，然后配置接口`quickSaveItemApi`，可以直接将编辑表单项渲染至表格内操作。
+如果想编辑完表单项之后，不想点击顶部确认按钮来进行保存，而是即时保存当前标记的数据，则需要配置`quickEdit`中`"saveImmediately": true`，然后配置接口`quickSaveItemApi`。可以直接将编辑表单项渲染至表格内，可以直接操作编辑。
 
 ```schema: scope="body"
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveItemApi": "/api/mock2/sample/$id",
+    "api": "/api/sample",
+    "quickSaveItemApi": "/api/sample/$id",
     "columns": [
         {
             "name": "id",
@@ -964,17 +882,6 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
                 ],
                 "saveImmediately": true
             }
-        },
-        {
-            "name": "switch",
-            "label": "switch",
-            "quickEdit": {
-                "mode": "inline",
-                "type": "switch",
-                "onText": "开启",
-                "offText": "关闭",
-                "saveImmediately": true
-            }
         }
     ]
 }
@@ -986,7 +893,7 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "columns": [
         {
             "name": "id",
@@ -1007,19 +914,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
                     "X"
                 ],
                 "saveImmediately": {
-                    "api": "/api/mock2/sample/$id"
+                    "api": "/api/sample/$id"
                 }
-            }
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade",
-            "quickEdit": {
-                "mode": "inline",
-                "type": "switch",
-                "onText": "开启",
-                "offText": "关闭",
-                "saveImmediately": true
             }
         }
     ]
@@ -1034,8 +930,8 @@ amis 只负责生成下拉选择器组件，并将搜索参数传递给接口，
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "quickSaveApi": "/api/mock2/sample/bulkUpdate",
+    "api": "/api/sample",
+    "quickSaveApi": "/api/sample/bulkUpdate",
     "columns": [
         {
             "name": "id",
@@ -1059,7 +955,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": [
         {
             "type": "tpl",
@@ -1147,7 +1043,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
     "type": "crud",
     "name": "myCRUD",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": [
         {
             "label": "点击弹框",
@@ -1191,7 +1087,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": [],
     "footerToolbar": ["switch-per-page", "pagination"],
     "columns": [
@@ -1214,7 +1110,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
                     "X"
                 ],
                 "saveImmediately": {
-                    "api": "/api/mock2/sample/$id"
+                    "api": "/api/sample/$id"
                 }
             }
         }
@@ -1330,7 +1226,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": [
         "bulkActions"
     ],
@@ -1338,7 +1234,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
         {
             "label": "批量删除",
             "actionType": "ajax",
-            "api": "delete:/api/mock2/sample/${ids|raw}",
+            "api": "delete:/api/sample/${ids|raw}",
             "confirmText": "确定要批量删除?"
         },
         {
@@ -1348,7 +1244,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
                 "title": "批量编辑",
                 "body": {
                     "type": "form",
-                    "api": "/api/mock2/sample/bulkUpdate2",
+                    "api": "/api/sample/bulkUpdate2",
                     "body": [
                         {
                             "type": "hidden",
@@ -1398,7 +1294,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 - `items` `Array<object>` 选中的行数据。
 - `rows` items 的别名，推荐用 items。
 - `selectedItems` `Array<object>` 选中的行数据，建议直接用 items。
-- `unSelectedItems` `Array<object>` 没选中的行数据也可获取。
+- `unselectedItems` `Array<object>` 没选中的行数据也可获取。
 - `ids` `string` 多个 id 值用英文逗号隔开，前提是行数据中有 id 字段，或者有指定的 `primaryField` 字段。
 - `第一行所有行数据` 还有第一行的所有行数据也会包含进去。
 
@@ -1422,7 +1318,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": [
         "bulkActions"
     ],
@@ -1432,7 +1328,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
         {
             "label": "批量删除",
             "actionType": "ajax",
-            "api": "delete:/api/mock2/sample/${ids|raw}",
+            "api": "delete:/api/sample/${ids|raw}",
             "confirmText": "确定要批量删除?"
         },
         {
@@ -1442,77 +1338,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
                 "title": "批量编辑",
                 "body": {
                     "type": "form",
-                    "api": "/api/mock2/sample/bulkUpdate2",
-                    "body": [
-                        {
-                            "type": "hidden",
-                            "name": "ids"
-                        },
-                        {
-                            "type": "input-text",
-                            "name": "engine",
-                            "label": "Engine"
-                        }
-                    ]
-                }
-            }
-        }
-    ],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-还可以设置 `"checkOnItemClick": true` 属性来支持点击一行的触发选中状态切换
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "checkOnItemClick": true,
-    "headerToolbar": [
-        "bulkActions"
-    ],
-    "bulkActions": [
-        {
-            "label": "批量删除",
-            "actionType": "ajax",
-            "api": "delete:/api/mock2/sample/${ids|raw}",
-            "confirmText": "确定要批量删除?"
-        },
-        {
-            "label": "批量修改",
-            "actionType": "dialog",
-            "dialog": {
-                "title": "批量编辑",
-                "body": {
-                    "type": "form",
-                    "api": "/api/mock2/sample/bulkUpdate2",
+                    "api": "/api/sample/bulkUpdate2",
                     "body": [
                         {
                             "type": "hidden",
@@ -1565,7 +1391,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": ["statistics"],
     "columns": [
         {
@@ -1604,7 +1430,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": ["load-more"],
     "columns": [
         {
@@ -1643,53 +1469,8 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "https://houtai.baidu.com/api/sample",
     "headerToolbar": ["export-csv"],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-### 通过 api 导出 CSV
-
-> 1.4.0 及以上版本
-
-`export-csv` 可以单独配置 `api` 实现导出全量功能，这个 api 的返回结果和 CRUD 类似
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "headerToolbar": [{
-        "type": "export-csv",
-        "label": "全量导出 CSV",
-        "api": "/api/mock2/sample"
-    }],
     "columns": [
         {
             "name": "id",
@@ -1731,7 +1512,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "headerToolbar": ["export-excel"],
     "columns": [
         {
@@ -1762,52 +1543,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 }
 ```
 
-#### 只导出部分列
-
-> 1.4.0 及以上版本
-
-通过配置 `columns` 来支持只导出部分列，其中是需要导出的列 `name` 数组
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "headerToolbar": [{
-        "type": "export-excel",
-        "label": "只导出 engine 和  browser 列",
-        "columns": ["engine", "browser"]
-    }],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-#### 通过 api 导出 Excel
+### 通过 api 导出 Excel
 
 > 1.1.6 以上版本支持
 
@@ -1820,7 +1556,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
     "headerToolbar": [{
         "type": "export-excel",
         "label": "全量导出 Excel",
-        "api": "/api/mock2/sample"
+        "api": "/api/sample"
     }],
     "columns": [
         {
@@ -1851,7 +1587,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 }
 ```
 
-#### 自定义导出 Excel 的文件名
+### 自定义导出 Excel 的文件名
 
 > 1.1.7 以上版本支持
 
@@ -1865,7 +1601,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
         "type": "export-excel",
         "label": "自定义导出 Excel",
         "filename": "自定义文件名${test}",
-        "api": "/api/mock2/sample"
+        "api": "/api/sample"
     }],
     "columns": [
         {
@@ -1904,7 +1640,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
      "filter": {
         "title": "条件搜索",
         "body": [
@@ -1918,95 +1654,6 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
     "filterTogglable": true,
     "headerToolbar": [
         "filter-toggler"
-    ],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-### 刷新按钮
-
-> 1.5.0 及以上版本
-
-可以通过 `reload` 来展现刷新按钮
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "headerToolbar": [
-        "reload"
-    ],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-它其实是个简化的 `button` 组件，可以参考 `button` 组件的文档做调整，比如
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "syncLocation": false,
-    "api": "/api/mock2/sample",
-    "headerToolbar": [
-        {
-            "type": "reload",
-            "align": "right",
-            "icon": "iconfont icon-refresh",
-            "label": "刷新",
-            "tooltip": "",
-            "level": "success"
-        }
     ],
     "columns": [
         {
@@ -2053,7 +1700,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
   "type": "crud",
   "syncLocation": false,
-  "api": "/api/mock2/sample",
+  "api": "/api/sample",
   "draggable": true,
   "columns": [
     {
@@ -2096,7 +1743,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
           },
           {
             "type": "form",
-            "api": "/api/mock2/sample/$id",
+            "api": "/api/sample/$id",
             "body": [
               {
                 "type": "input-text",
@@ -2124,7 +1771,7 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "draggable": true,
     "columns": [
         {
@@ -2191,51 +1838,6 @@ crud 组件支持通过配置`headerToolbar`和`footerToolbar`属性，实现在
 
 这样就只会发送 ids 了。
 
-### 列排序
-
-通过配置`headerToolbar` 中 `columns-toggler` 的 `"draggable": true`可以实现设置显示列和列排序功能。
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "api": "/api/mock2/sample",
-    "syncLocation": false,
-    "headerToolbar": [
-        {
-            "type": "columns-toggler",
-            "align": "right",
-            "draggable": true
-        }
-    ],
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
 ## 单条操作
 
 当操作对象是单条数据时这类操作叫单条操作，比如：编辑、删除、通过、拒绝等等。CRUD 的 table 模式可以在 column 通过放置按钮来完成（其他模式参考 table 模式）。比如编辑就是添加个按钮行为是弹框类型的按钮或者添加一个页面跳转类型的按钮把当前行数据的 id 放在 query 中传过去、删除操作就是配置一个按钮行为是 AJAX 类型的按钮，将数据通过 api 发送给后端完成。
@@ -2300,7 +1902,7 @@ CRUD 中不限制有多少个单条操作、添加一个操作对应的添加一
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "loadDataOnce": true,
     "columns": [
         {
@@ -2338,7 +1940,7 @@ CRUD 中不限制有多少个单条操作、添加一个操作对应的添加一
 {
     "type": "crud",
     "syncLocation": false,
-    "api": "/api/mock2/sample",
+    "api": "/api/sample",
     "loadDataOnce": true,
     "source": "${rows | filter:engine:match:keywords}",
     "filter":{
@@ -2424,98 +2026,6 @@ CRUD 中不限制有多少个单条操作、添加一个操作对应的添加一
 }
 ```
 
-## 自定义点击行的行为
-
-> 1.4.0 及以上版本
-
-配置 `itemAction` 可以实现点击某一行后进行自定义操作，支持 [action](./action) 里的所有配置，比如弹框、刷新其它组件等。
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "api": "/api/mock2/sample",
-    "syncLocation": false,
-    "itemAction": {
-      "type": "button",
-      "actionType": "dialog",
-      "dialog": {
-        "title": "详情",
-        "body": "当前行的数据 browser: ${browser}, version: ${version}"
-      }
-    },
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
-注意这个属性和 `checkOnItemClick` 冲突，因为都是定义行的点击行为，开启 `itemAction` 后 `checkOnItemClick` 将会失效。
-
-> 1.4.2 及以上版本
-
-itemAction 里的 onClick 还能通过 `data` 参数拿到当前行的数据，方便进行下一步操作
-
-```schema: scope="body"
-{
-    "type": "crud",
-    "api": "/api/mock2/sample",
-    "syncLocation": false,
-    "itemAction": {
-      "type": "button",
-      "onClick": "console.log(data); alert(data.engine)"
-    },
-    "columns": [
-        {
-            "name": "id",
-            "label": "ID"
-        },
-        {
-            "name": "engine",
-            "label": "Rendering engine"
-        },
-        {
-            "name": "browser",
-            "label": "Browser"
-        },
-        {
-            "name": "platform",
-            "label": "Platform(s)"
-        },
-        {
-            "name": "version",
-            "label": "Engine version"
-        },
-        {
-            "name": "grade",
-            "label": "CSS grade"
-        }
-    ]
-}
-```
-
 ## 属性表
 
 | 属性名                                | 类型                        | 默认值                          | 说明                                                                                                                  |
@@ -2566,10 +2076,3 @@ itemAction 里的 onClick 还能通过 `data` 参数拿到当前行的数据，�
 | footerToolbar                         | Array                       | `['statistics', 'pagination']`  | 底部工具栏配置                                                                                                        |
 | alwaysShowPagination                  | `boolean`                   | `false`                         | 是否总是显示分页                                                                                                      |
 | affixHeader                           | `boolean`                   | `true`                          | 是否固定表头(table 下)                                                                                                |
-| autoGenerateFilter                    | `boolean`                   | `false`                         | 是否开启查询区域，开启后会根据列元素的 `searchable` 属性值，自动生成查询条件表单                                      |
-
-注意除了上面这些属性，CRUD 在不同模式下的属性需要参考各自的文档，比如
-
-- 默认 [Table](./table) 模式里的列配置。
-- [Cards](./cards) 模式。
-- [List](./list) 模式。

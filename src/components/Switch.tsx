@@ -28,15 +28,15 @@ interface SwitchProps {
   className?: string;
   classPrefix: string;
   classnames: ClassNamesFn;
-  onChange?: (checked: boolean | string | number) => void;
-  value?: boolean | string | number;
+  onChange?: (checked: boolean) => void;
+  value?: any;
   inline?: boolean;
-  trueValue?: boolean | string | number;
-  falseValue?: boolean | string | number;
+  trueValue?: any;
+  falseValue?: any;
   disabled?: boolean;
   readOnly?: boolean;
-  onText?: React.ReactNode;
-  offText?: React.ReactNode;
+  onText?: string;
+  offText?: string;
   checked?: boolean;
 }
 
@@ -59,7 +59,7 @@ export class Switch extends React.PureComponent<SwitchProps, any> {
       return;
     }
 
-    onChange(e.currentTarget.checked ? trueValue! : falseValue!);
+    onChange(e.currentTarget.checked ? trueValue : falseValue);
   }
 
   render() {
